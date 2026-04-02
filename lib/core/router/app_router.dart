@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 
+import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 
 part 'app_router.gr.dart';
@@ -9,6 +10,7 @@ class AppRouter extends RootStackRouter{
 
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(page: RegisterRoute.page, initial: true)
+    AutoRoute(page: RegisterRoute.page, path: '/register', initial: true),
+    AutoRoute(page: LoginRoute.page, path: '/login')
   ];
 }

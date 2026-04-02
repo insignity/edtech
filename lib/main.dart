@@ -1,11 +1,25 @@
+import 'package:edtech/core/router/observers/app_route_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/constants/constants.dart';
 import 'core/router/app_router.dart';
 import 'core/sl/injection.dart';
+import 'core/utils/app_bloc_observer.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = AppBlocObserver();
+  injectServiceLocator();
+
+  l.i("data");
+  l.t("data");
+  l.d("data");
+  l.e("data");
+  l.f("data");
+  l.w("data");
+
   runApp(
       MultiBlocProvider(
         providers: [
@@ -27,7 +41,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      routerConfig: _appRouter.config(),
+      routerConfig: _appRouter.config(
+        navigatorObservers: ()=>[AppRouteObserver()],
+      ),
     );
   }
 }

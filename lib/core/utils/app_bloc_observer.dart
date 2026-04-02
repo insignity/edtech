@@ -1,0 +1,47 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
+
+class AppBlocObserver extends BlocObserver {
+
+  @override
+  void onCreate(BlocBase bloc) {
+    super.onCreate(bloc);
+    debugPrint('BLOC CREATED -> ${bloc.runtimeType}');
+  }
+
+  @override
+  void onEvent(Bloc bloc, Object? event) {
+    super.onEvent(bloc, event);
+    debugPrint('EVENT -> ${bloc.runtimeType} $event');
+  }
+
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    debugPrint(
+      'CHANGE -> ${bloc.runtimeType} '
+          '${change.currentState} -> ${change.nextState}',
+    );
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    debugPrint(
+      'TRANSITION -> ${bloc.runtimeType} '
+          '$transition',
+    );
+  }
+
+  @override
+  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+    debugPrint('ERROR -> ${bloc.runtimeType} $error');
+    super.onError(bloc, error, stackTrace);
+  }
+
+  @override
+  void onClose(BlocBase bloc) {
+    debugPrint('BLOC CLOSED -> ${bloc.runtimeType}');
+    super.onClose(bloc);
+  }
+}
