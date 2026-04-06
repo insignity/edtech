@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:edtech/core/router/app_router.dart';
 import 'package:flutter/material.dart';
@@ -47,126 +46,132 @@ class _RegisterPageState extends State<RegisterPage> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Colors.white,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    padding: EdgeInsets.zero,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        Text('Sign Up', textAlign: TextAlign.center),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 12,
+                            left: 16,
+                            right: 16,
+                          ),
+                          child: TextFormField(
+                            controller: firstNameController,
+                            decoration: const InputDecoration().copyWith(
+                              label: const Text('First name'),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 12,
+                            left: 16,
+                            right: 16,
+                          ),
+                          child: TextFormField(
+                            controller: lastNameController,
+                            decoration: const InputDecoration().copyWith(
+                              label: const Text('Last name'),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            top: 12,
+                            right: 16,
+                          ),
+                          child: TextFormField(
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              label: Text('Email'),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            top: 12,
+                            right: 16,
+                          ),
+                          child: TextFormField(
+                            controller: phoneController,
+                            decoration: const InputDecoration(
+                              label: Text('Phone'),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            top: 12,
+                            right: 16,
+                          ),
+                          child: TextFormField(
+                            controller: passwordController,
+                            decoration: const InputDecoration(
+                              label: Text('Password'),
+                            ),
+                            obscureText: true,
+                            obscuringCharacter: '*',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 32),
-                        child: Text('Sign Up'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 12,
-                          left: 16,
-                          right: 16,
-                        ),
-                        child: TextFormField(
-                          controller: firstNameController,
-                          decoration: const InputDecoration().copyWith(
-                            label: const Text('First name'),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 12,
-                          left: 16,
-                          right: 16,
-                        ),
-                        child: TextFormField(
-                          controller: lastNameController,
-                          decoration: const InputDecoration().copyWith(
-                            label: const Text('Last name'),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          top: 12,
-                          right: 16,
-                        ),
-                        child: TextFormField(
-                          controller: emailController,
-                          decoration: const InputDecoration(
-                            label: Text('Email'),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          top: 12,
-                          right: 16,
-                        ),
-                        child: TextFormField(
-                          controller: phoneController,
-                          decoration: const InputDecoration(
-                            label: Text('Phone'),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          top: 12,
-                          right: 16,
-                        ),
-                        child: TextFormField(
-                          controller: passwordController,
-                          decoration: const InputDecoration(
-                            label: Text('Password'),
-                          ),
-                          obscureText: true,
-                          obscuringCharacter: '*',
-                        ),
+                      Text('Have an account? '),
+                      GestureDetector(
+                        onTap: () {
+                          context.router.replace(LoginRoute());
+                        },
+                        child: Text('Sign In'),
                       ),
                     ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Have an account? '),
-                    GestureDetector(onTap: () {
-                      context.router.replace(LoginRoute());
-                    }, child: Text('Sign In')),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 44),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      bloc.add(
-                        Register(
-                          email: emailController.text,
-                          password: passwordController.text,
-                          firstName: firstNameController.text,
-                          lastName: lastNameController.text,
-                          phone: phoneController.text,
-                        ),
-                      );
-                    }
-                  }, //login,
-                  child: Builder(
-                    builder: (context) {
-                      return const Text('SIGN UP');
-                    },
+                Container(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 44,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        bloc.add(
+                          Register(
+                            email: emailController.text,
+                            password: passwordController.text,
+                            firstName: firstNameController.text,
+                            lastName: lastNameController.text,
+                            phone: phoneController.text,
+                          ),
+                        );
+                      }
+                    }, //login,
+                    child: Builder(
+                      builder: (context) {
+                        return const Text('SIGN UP');
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
