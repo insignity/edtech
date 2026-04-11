@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:edtech/core/router/app_router.dart';
+import 'package:edtech/core/utils/validators/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/sl/injection.dart';
 import '../bloc/auth_bloc.dart';
 import '../widgets/auth_button.dart';
 
@@ -14,12 +15,11 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with EmailValidator {
   final TextEditingController emailController = TextEditingController();
 
   final TextEditingController passwordController = TextEditingController();
 
-  late final AuthBloc bloc = sl<AuthBloc>();
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   @override
@@ -36,10 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 32),
-                      child: Text('Sign In'),
-                    ),
+                    Text('Sign In', textAlign: TextAlign.center),
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 16,
@@ -48,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: TextFormField(
                         controller: emailController,
+                        validator: validateEmail,
                         decoration: const InputDecoration(label: Text('Email')),
                       ),
                     ),
@@ -87,23 +85,53 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Container(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 44),
-              child: AuthButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    bloc.add(
-                      Login(
-                        email: emailController.text,
-                        password: passwordController.text,
-                      ),
+              child: BlocListener<AuthBloc, AuthState>(
+                listener: (_, state) {
+                  if (state is AuthSuccess) {
+                    context.router.replace(ProfileRoute());
+                  } else if (state is AuthError) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Error'),
+                          content: Text(state.message),
+                          actions: [
+                            TextButton(
+                              onPressed: () => context.router.pop(),
+                              child: Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   }
                 },
-                text: "Sign in",
+                child: AuthButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      context.read<AuthBloc>().add(
+                        Login(
+                          email: emailController.text,
+                          password: passwordController.text,
+                        ),
+                      );
+                    }
+                  },
+                  text: "Sign in",
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }

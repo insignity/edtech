@@ -36,11 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
       bloc: bloc,
       listener: (context, state) {
         if (state is AuthSuccess) {
-          // context.router.push(const RegistrationRouter());
-        } else {
-          // WidgetsBinding.instance.addPostFrameCallback((_) {
-          //
-          // });
+          context.router.replace(const ProfileRoute());
         }
       },
       builder: (context, state) {
@@ -176,5 +172,15 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }
