@@ -6,7 +6,7 @@ import 'core/constants/constants.dart';
 import 'core/router/app_router.dart';
 import 'core/sl/injection.dart';
 import 'core/utils/app_bloc_observer.dart';
-import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/bloc/auth_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

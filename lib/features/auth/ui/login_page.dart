@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/auth_bloc.dart';
-import '../widgets/auth_button.dart';
+import 'widgets/auth_button.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget {
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> with EmailValidator {
               child: BlocListener<AuthBloc, AuthState>(
                 listener: (_, state) {
                   if (state is AuthSuccess) {
-                    context.router.replace(ProfileRoute());
+                    context.router.replaceAll([ProfileRoute()]);
                   } else if (state is AuthError) {
                     showDialog(
                       context: context,

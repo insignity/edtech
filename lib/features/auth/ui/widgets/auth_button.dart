@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/auth_bloc.dart';
+import '../../bloc/auth_bloc.dart';
 
 class AuthButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -24,7 +24,7 @@ class AuthButton extends StatelessWidget {
         } else if (state is AuthInitial) {
           return ElevatedButton(onPressed: onPressed, child: Text(text));
         }
-        return Placeholder();
+        return SizedBox.shrink();
       },
     );
   }

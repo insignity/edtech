@@ -1,14 +1,12 @@
-import 'package:edtech/features/auth/domain/entities/token_auth.dart';
-
 import '../../../../core/utils/types.dart';
 
-class TokenModel extends TokenEntity {
-  TokenModel({required super.access, required super.refresh});
+class TokenModel {
+  final String access;
 
-  factory TokenModel.fromJson(Json json) => TokenModel(
-    access: json['access'] as String,
-    refresh: json['refresh'] as String,
-  );
+  TokenModel({required this.access});
+
+  factory TokenModel.fromJson(Json json) =>
+      TokenModel(access: json['access'] as String);
 }
 
 //{

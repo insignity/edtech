@@ -1,5 +1,5 @@
-import 'package:edtech/features/auth/domain/use_cases/login_use_case.dart';
-import 'package:edtech/features/auth/domain/use_cases/register_use_case.dart';
+import 'package:edtech/features/auth/data/auth_api.dart';
+import 'package:edtech/features/auth/data/auth_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -7,15 +7,13 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final LoginUseCase login;
-  final RegisterUseCase register;
-
-  AuthBloc(this.login, this.register) : super(AuthInitial()) {
+  final AuthRepository repository;
+  AuthBloc(this.repository) : super(AuthInitial()) {
     on<AuthEvent>((event, emit) async {
       if (event is Register) {
         emit(AuthLoading());
         try {
-          final response = await register.execute(
+          final response = await repository.register(
             email: event.email,
             firstName: event.firstName,
             lastName: event.lastName,
@@ -31,7 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (event is Login) {
         emit(AuthLoading());
         try {
-          final response = await login.execute(
+          final response = await repository.login(
             email: event.email,
             password: event.password,
           );

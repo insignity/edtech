@@ -1,14 +1,18 @@
-import 'package:edtech/features/auth/domain/entities/register_entity.dart';
 
 import '../../../../core/utils/types.dart';
 
-class RegisterModel extends RegisterEntity {
+class RegisterModel  {
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phone;
+
 
   RegisterModel({
-    required super.email,
-    required super.firstName,
-    required super.lastName,
-    required super.phone,
+    required this.email,
+    required this.firstName,
+    required this.lastName,
+    required this.phone,
   });
 
   factory RegisterModel.fromJson(Json json) {
