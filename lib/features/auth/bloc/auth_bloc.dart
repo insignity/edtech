@@ -1,4 +1,3 @@
-import 'package:edtech/features/auth/data/auth_api.dart';
 import 'package:edtech/features/auth/data/auth_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
@@ -8,6 +7,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository repository;
+
   AuthBloc(this.repository) : super(AuthInitial()) {
     on<AuthEvent>((event, emit) async {
       if (event is Register) {

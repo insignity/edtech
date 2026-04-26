@@ -1,24 +1,25 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'logger.dart';
 
 class AppBlocObserver extends BlocObserver {
 
   @override
   void onCreate(BlocBase bloc) {
     super.onCreate(bloc);
-    debugPrint('BLOC CREATED -> ${bloc.runtimeType}');
+    logger.i('BLOC CREATED -> ${bloc.runtimeType}');
   }
 
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    debugPrint('EVENT -> ${bloc.runtimeType} $event');
+    logger.i('EVENT -> ${bloc.runtimeType} $event');
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    debugPrint(
+    logger.i(
       'CHANGE -> ${bloc.runtimeType} '
           '${change.currentState} -> ${change.nextState}',
     );
@@ -27,7 +28,7 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    debugPrint(
+    logger.i(
       'TRANSITION -> ${bloc.runtimeType} '
           '$transition',
     );
