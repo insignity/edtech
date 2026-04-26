@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 
-import '../../constants/constants.dart';
-import '../../utils/logger.dart';
+import '../../utils/my_logger.dart';
 
 class TokenInterceptor implements Interceptor {
   final TokenService tokenService;
@@ -11,7 +10,7 @@ class TokenInterceptor implements Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    logger.e("Token interceptor error: $err");
+    logger.e("Token interceptor error: $err, $handler");
   }
 
   @override
@@ -21,8 +20,13 @@ class TokenInterceptor implements Interceptor {
   ) async {
     if (options.extra['putToken'] == true) {
       final token = await tokenService.getAccess();
-      logger.i("token: $token");
-      handler.next(options..headers.addAll({"Authorization": "Bearer $token"}));
+
+      final newOptions = options
+        ..headers.addAll({"Authorization": "Bearer $token"});
+
+      logger.i("API request: $options");
+
+      handler.next(newOptions);
     }
   }
 
@@ -31,6 +35,8 @@ class TokenInterceptor implements Interceptor {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
-    logger.i("Api response: $response");
+    logger.i("API response: $response");
+
+    handler.next(response);
   }
 }

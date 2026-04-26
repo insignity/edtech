@@ -1,7 +1,8 @@
-import 'package:edtech/core/api/api_client.dart';
+import 'package:edtech/core/utils/error_handler.dart';
 import 'package:edtech/features/auth/data/auth_api.dart';
 
 import '../../../core/services/token/token_service.dart';
+import '../../../core/utils/my_logger.dart';
 import '../models/register_model.dart';
 import '../models/token_model.dart';
 
@@ -28,9 +29,16 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    final token = await api.login(email, password);
-    await tokenService.setAccess(token.access);
-    return token;
+    logger.i("$this.login started");
+
+    return guard<TokenModel>(() async {
+      final token = await api.login(email, password);
+      await tokenService.setAccess(token.access);
+
+      logger.i("$this.login ended");
+
+      return token;
+    });
   }
 
   @override
@@ -41,12 +49,20 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String phone,
   }) async {
-    return await api.register(
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      password: password,
-      phone: phone,
-    );
+    logger.i("$this.register() started");
+
+    return guard<RegisterModel>(() async {
+      final response = await api.register(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password,
+        phone: phone,
+      );
+
+      logger.i("$this.register() ended");
+
+      return response;
+    });
   }
 }

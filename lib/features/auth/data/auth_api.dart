@@ -1,9 +1,7 @@
 import 'package:edtech/core/api/api_client.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 
-import '../../../core/constants/constants.dart';
 import '../../../core/utils/types.dart';
-
 import '../models/register_model.dart';
 import '../models/token_model.dart';
 
@@ -19,16 +17,16 @@ class AuthApi {
         '/token/',
         data: {'email': email, 'password': password},
       );
-      return TokenModel.fromJson(response as Json);
+      return TokenModel.fromJson(response.data as Json);
     } catch (e) {
       throw Exception(e);
     }
   }
 
-//{
-//   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc3NTcxMTg0MiwiaWF0IjoxNzc1MTA3MDQyLCJqdGkiOiJjZGFkN2I4MGRmMzA0ZjI1YmJmODFiNmVkNDJjZDllNSIsInVzZXJfaWQiOiI3In0.880m1cjfR3ma38_hRDZru1x-XPsvENFBZ9SLYUNKHww",
-//   "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc1MTEwNjQyLCJpYXQiOjE3NzUxMDcwNDIsImp0aSI6ImE4YWVkZGU3MDMxNDRmYmM4MDBmMGNiYzIyMTNiODc1IiwidXNlcl9pZCI6IjcifQ.eQEQFTTy5L2VsJgN-GROlE0shRzTVQ75tN02EDJ6_ck"
-// }
+  //{
+  //   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc3NTcxMTg0MiwiaWF0IjoxNzc1MTA3MDQyLCJqdGkiOiJjZGFkN2I4MGRmMzA0ZjI1YmJmODFiNmVkNDJjZDllNSIsInVzZXJfaWQiOiI3In0.880m1cjfR3ma38_hRDZru1x-XPsvENFBZ9SLYUNKHww",
+  //   "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc1MTEwNjQyLCJpYXQiOjE3NzUxMDcwNDIsImp0aSI6ImE4YWVkZGU3MDMxNDRmYmM4MDBmMGNiYzIyMTNiODc1IiwidXNlcl9pZCI6IjcifQ.eQEQFTTy5L2VsJgN-GROlE0shRzTVQ75tN02EDJ6_ck"
+  // }
 
   Future<RegisterModel> register({
     required String email,
@@ -50,4 +48,3 @@ class AuthApi {
     return RegisterModel.fromJson(response.data as Json);
   }
 }
-

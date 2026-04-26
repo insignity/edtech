@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/logger.dart';
+import '../../utils/my_logger.dart';
 
 class AppRouteObserver extends NavigatorObserver {
   void _log(String message) {

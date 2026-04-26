@@ -1,9 +1,9 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'logger.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'my_logger.dart';
 
 class AppBlocObserver extends BlocObserver {
-
   @override
   void onCreate(BlocBase bloc) {
     super.onCreate(bloc);
@@ -21,7 +21,7 @@ class AppBlocObserver extends BlocObserver {
     super.onChange(bloc, change);
     logger.i(
       'CHANGE -> ${bloc.runtimeType} '
-          '${change.currentState} -> ${change.nextState}',
+      '${change.currentState} -> ${change.nextState}',
     );
   }
 
@@ -30,7 +30,7 @@ class AppBlocObserver extends BlocObserver {
     super.onTransition(bloc, transition);
     logger.i(
       'TRANSITION -> ${bloc.runtimeType} '
-          '$transition',
+      '$transition',
     );
   }
 

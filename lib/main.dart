@@ -3,11 +3,10 @@ import 'package:edtech/core/theme/app_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'core/constants/constants.dart';
 import 'core/router/app_router.dart';
 import 'core/sl/injection.dart';
 import 'core/utils/app_bloc_observer.dart';
-import 'core/utils/logger.dart';
+import 'core/utils/my_logger.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 
 void main() {
@@ -23,16 +22,14 @@ void main() {
   logger.w("data");
 
   runApp(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_)=>sl<AuthBloc>()),
-        ],
-    child: MyApp(),
-  ));
+    MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => sl<AuthBloc>())],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-
   final _appRouter = AppRouter();
 
   // This widget is the root of your application.
@@ -42,7 +39,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: AppThemes.mobile,
       routerConfig: _appRouter.config(
-        navigatorObservers: ()=>[AppRouteObserver()],
+        navigatorObservers: () => [AppRouteObserver()],
       ),
     );
   }
