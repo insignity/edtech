@@ -7,7 +7,10 @@ import 'core/router/app_router.dart';
 import 'core/sl/injection.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'core/utils/my_logger.dart';
-import 'features/auth/bloc/auth_bloc.dart';
+import 'features/auth/ui/bloc/auth_bloc.dart';
+import 'features/courses/ui/bloc/course_details/course_details_bloc.dart';
+import 'features/courses/ui/bloc/courses/courses_bloc.dart';
+import 'features/profile/ui/bloc/profile_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,14 +26,19 @@ void main() {
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => sl<AuthBloc>())],
+      providers: [
+        BlocProvider(create: (_) => sl<AuthBloc>()),
+        BlocProvider(create: (_) => sl<ProfileBloc>()),
+        BlocProvider(create: (_) => sl<CoursesBloc>()),
+        BlocProvider(create: (_) => sl<CourseDetailsBloc>()),
+      ],
       child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final _appRouter = AppRouter();
+  final _appRouter = AppRouter(sl());
 
   // This widget is the root of your application.
   @override

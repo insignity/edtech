@@ -10,7 +10,9 @@ class TokenInterceptor implements Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    logger.e("Token interceptor error: $err, $handler");
+    logger.e("ERROR Token interceptor", error: err);
+
+    handler.next(err);
   }
 
   @override
@@ -18,16 +20,13 @@ class TokenInterceptor implements Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    RequestOptions newOptions = options;
     if (options.extra['putToken'] == true) {
       final token = await tokenService.getAccess();
 
-      final newOptions = options
-        ..headers.addAll({"Authorization": "Bearer $token"});
-
-      logger.i("API request: $options");
-
-      handler.next(newOptions);
+      options.headers.addAll({"Authorization": "Bearer $token"});
     }
+    handler.next(newOptions);
   }
 
   @override
@@ -35,7 +34,7 @@ class TokenInterceptor implements Interceptor {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
-    logger.i("API response: $response");
+    logger.i("RESPONSE: $response");
 
     handler.next(response);
   }

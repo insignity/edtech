@@ -9,6 +9,8 @@ import '../models/token_model.dart';
 abstract class AuthRepository {
   Future<TokenModel> login({required String email, required String password});
 
+  Future logout();
+
   Future<RegisterModel> register({
     required String email,
     required String firstName,
@@ -64,5 +66,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return response;
     });
+  }
+
+  @override
+  Future<dynamic> logout() async {
+    logger.i("$this .logout() ");
+    await tokenService.deleteAccess();
   }
 }

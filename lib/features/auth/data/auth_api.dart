@@ -1,5 +1,4 @@
 import 'package:edtech/core/api/api_client.dart';
-import 'package:edtech/core/services/token/token_service.dart';
 
 import '../../../core/utils/types.dart';
 import '../models/register_model.dart';
@@ -7,9 +6,8 @@ import '../models/token_model.dart';
 
 class AuthApi {
   final ApiClient api;
-  final TokenService tokenService;
 
-  AuthApi(this.api, this.tokenService);
+  AuthApi(this.api);
 
   Future<TokenModel> login(String email, String password) async {
     try {

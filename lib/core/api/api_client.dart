@@ -3,6 +3,7 @@ import 'package:edtech/core/api/interceptors/token_interceptor.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 
 import '../utils/types.dart';
+import 'interceptors/curl_interceptor.dart';
 
 class ApiClient {
   final Dio _dio;
@@ -18,7 +19,10 @@ class ApiClient {
           headers: {'Content-Type': 'application/json'},
         ),
       ) {
-    _dio.interceptors.addAll([TokenInterceptor(_tokenService)]);
+    _dio.interceptors.addAll([
+      TokenInterceptor(_tokenService),
+      CurlInterceptor(),
+    ]);
   }
 
   Future<Response> get(

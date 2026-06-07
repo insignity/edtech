@@ -6,11 +6,12 @@ abstract class TokenService {
   Future setAccess(String value);
 
   Future deleteAccess();
+
+  Future<bool> hasAccessToken();
 }
 
 class TokenServiceImpl implements TokenService {
   final FlutterSecureStorage storage;
-
 
   TokenServiceImpl(this.storage);
 
@@ -29,5 +30,11 @@ class TokenServiceImpl implements TokenService {
   @override
   Future<dynamic> deleteAccess() async {
     await storage.delete(key: _accessKey);
+  }
+
+  @override
+  Future<bool> hasAccessToken() async {
+    final response = await getAccess();
+    return response != null && response.isNotEmpty;
   }
 }

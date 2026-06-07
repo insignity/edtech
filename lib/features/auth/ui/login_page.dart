@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../shared/extensions/extensions.dart';
-import '../bloc/auth_bloc.dart';
+import 'bloc/auth_bloc.dart';
 import 'widgets/auth_button.dart';
 
 @RoutePage()
@@ -39,6 +39,14 @@ class _LoginPageState extends State<LoginPage> with EmailValidator {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   WelcomeVideo(),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                        Login(email: "aero@mail.ru", password: "aeroaero123"),
+                      );
+                    },
+                    child: Text("Login cheatcode"),
+                  ),
                   Text(
                     'Sign In',
                     style: context.text.headlineMedium! + AppColors.primary,
@@ -53,7 +61,14 @@ class _LoginPageState extends State<LoginPage> with EmailValidator {
                     child: TextFormField(
                       controller: emailController,
                       validator: validateEmail,
-                      decoration: const InputDecoration(label: Text('Email')),
+                      decoration: InputDecoration(
+                        label: Row(
+                          children: [
+                            Text('Email'),
+                            Text('*', style: TextStyle() + AppColors.red),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   Padding(
@@ -64,24 +79,61 @@ class _LoginPageState extends State<LoginPage> with EmailValidator {
                     ),
                     child: TextFormField(
                       controller: passwordController,
-                      decoration: const InputDecoration(
-                        label: Text('Password'),
+                      decoration: InputDecoration(
+                        label: Row(
+                          children: [
+                            Text('Password'),
+                            Text('*', style: TextStyle() + AppColors.red),
+                          ],
+                        ),
                       ),
                       obscureText: true,
                       obscuringCharacter: '*',
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.only(top: 8, left: 16, right: 16),
+                    child: RichText(
+                      text: TextSpan(
+                        style:
+                            context.text.bodyMedium! +
+                            AppColors.gray.withAlpha(150),
+                        children: [
+                          TextSpan(text: 'By continuing, you agree to our '),
+                          TextSpan(
+                            text: 'Terms of Use',
+                            style:
+                                context.text.bodyMedium! +
+                                AppColors.primary.withAlpha(150),
+                          ),
+                          const TextSpan(text: ' and '),
+                          TextSpan(
+                            text: 'Privacy Policy.',
+                            style:
+                                context.text.bodyMedium! +
+                                AppColors.primary.withAlpha(150),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12, top: 24),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Don't have an account? "),
+                        Text(
+                          "Don't have an account? ",
+                          style: context.text.bodyLarge!,
+                        ),
                         GestureDetector(
                           onTap: () {
                             context.router.replace(RegisterRoute());
                           },
-                          child: Text('Sign up'),
+                          child: Text(
+                            'Sign up',
+                            style: context.text.bodyLarge! + AppColors.primary,
+                          ),
                         ),
                       ],
                     ),
@@ -95,7 +147,7 @@ class _LoginPageState extends State<LoginPage> with EmailValidator {
                     child: BlocListener<AuthBloc, AuthState>(
                       listener: (_, state) {
                         if (state is AuthSuccess) {
-                          context.router.replaceAll([ProfileRoute()]);
+                          context.router.replaceAll([CoursesRoute()]);
                         } else if (state is AuthError) {
                           showDialog(
                             context: context,
@@ -125,7 +177,7 @@ class _LoginPageState extends State<LoginPage> with EmailValidator {
                             );
                           }
                         },
-                        text: "Sign in",
+                        text: "SIGN IN",
                       ),
                     ),
                   ),

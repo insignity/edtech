@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/sl/injection.dart';
-import '../bloc/auth_bloc.dart';
+import '../../../core/theme/app_themes.dart';
+import '../../../shared/extensions/extensions.dart';
+import 'bloc/auth_bloc.dart';
 
 @RoutePage()
 class RegisterPage extends StatefulWidget {
@@ -17,12 +19,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   late final AuthBloc bloc = sl<AuthBloc>();
   final GlobalKey<FormState> _formKey = GlobalKey();
-
-  // final PasswordValidation _validator = PasswordValidation(
-  //   symbolsCaseValidate: true,
-  //   upperCaseValidate: true,
-  //   digitCaseValidate: true,
-  // );
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
@@ -52,7 +48,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children: [
-                        Text('Sign Up', textAlign: TextAlign.center),
+                        Text(
+                          'Sign up',
+                          style:
+                              context.text.headlineMedium! + AppColors.primary,
+                          textAlign: TextAlign.center,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(
                             top: 12,
@@ -86,12 +87,13 @@ class _RegisterPageState extends State<RegisterPage> {
                             right: 16,
                           ),
                           child: TextFormField(
-                            controller: emailController,
+                            controller: phoneController,
                             decoration: const InputDecoration(
-                              label: Text('Email'),
+                              label: Text('Phone'),
                             ),
                           ),
                         ),
+
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 16,
@@ -99,9 +101,19 @@ class _RegisterPageState extends State<RegisterPage> {
                             right: 16,
                           ),
                           child: TextFormField(
-                            controller: phoneController,
-                            decoration: const InputDecoration(
-                              label: Text('Phone'),
+                            controller: emailController,
+                            decoration: InputDecoration(
+                              label: Row(
+                                children: [
+                                  Text('Email', style: context.text.bodyMedium),
+                                  Text(
+                                    '*',
+                                    style:
+                                        context.text.bodyMedium! +
+                                        AppColors.red,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
