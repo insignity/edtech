@@ -20,7 +20,7 @@ class ApiClient {
         ),
       ) {
     _dio.interceptors.addAll([
-      TokenInterceptor(_tokenService),
+      TokenInterceptor(_tokenService, baseUrl: baseUrl),
       CurlInterceptor(),
     ]);
   }

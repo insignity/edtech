@@ -14,3 +14,14 @@ final class AuthError extends AuthState {
 }
 
 final class AuthSuccess extends AuthState {}
+
+final class AuthLoggedOut extends AuthState {}
+
+final class AuthPasswordResetSent extends AuthState {
+  final String uid;
+  final String token;
+
+  AuthPasswordResetSent({required this.uid, required this.token});
+}
+
+final class AuthPasswordResetSuccess extends AuthState {}

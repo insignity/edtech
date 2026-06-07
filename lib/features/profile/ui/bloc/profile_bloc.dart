@@ -9,21 +9,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ProfileRepository repository;
 
   ProfileBloc(this.repository) : super(ProfileInitial()) {
-    on<ProfileEvent>((event, emit) async {
-      if (event is FetchProfile) {
-        emit(ProfileLoading());
-        try {
-          final user = await repository.fetchProfile();
-          emit(ProfileLoaded(user));
-        } catch (e) {
-          emit(ProfileError(e.toString()));
-        }
-      } else if (event is LogoutProfile) {
-        emit(ProfileLoading());
-        await repository.logout();
-        emit(ProfileLoggedOut());
-        emit(ProfileInitial());
-      }
-    });
+    on<FetchProfile>(_onFetchProfile);
+  }
+
+  Future<void> _onFetchProfile(
+    FetchProfile event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(ProfileLoading());
+    try {
+      final user = await repository.fetchProfile();
+      emit(ProfileLoaded(user));
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
   }
 }

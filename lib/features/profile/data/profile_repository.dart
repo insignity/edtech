@@ -6,8 +6,6 @@ import '../../../core/utils/my_logger.dart';
 
 abstract class ProfileRepository {
   Future<UserModel> fetchProfile();
-
-  Future logout();
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -26,10 +24,5 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
       return response;
     });
-  }
-
-  @override
-  Future logout() async {
-    await api.logout();
   }
 }

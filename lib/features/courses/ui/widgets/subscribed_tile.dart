@@ -9,19 +9,22 @@ class SubscribedTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: .symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.primary.withAlpha(100), width: 3),
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.successLight,
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        "Subscribed",
-        textAlign: TextAlign.center,
-        style: context.text.bodyLarge?.copyWith(
-          color: AppColors.primary.withAlpha(150),
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.success),
+          const SizedBox(width: 4),
+          Text(
+            'Enrolled',
+            style: context.text.labelMedium! + AppColors.success,
+          ),
+        ],
       ),
     );
-    ;
   }
 }

@@ -1,6 +1,6 @@
-import 'package:edtech/features/auth/data/auth_repository.dart';
 import 'package:edtech/features/courses/data/services/lessons_store_service.dart';
 import 'package:edtech/features/courses/models/courses_model.dart';
+import 'package:edtech/features/courses/models/lesson_model.dart';
 import 'package:edtech/features/courses/models/lesson_navigation.dart';
 import 'package:edtech/features/courses/models/subscribe_model.dart';
 
@@ -10,23 +10,26 @@ import 'courses_api.dart';
 abstract class CoursesRepository {
   Future<CoursesModel> getAllCourses();
 
+  Future<CoursesModel> getMySubscriptions();
+
   Future<CourseDetailsModel> getCourseById(String courseId);
+
+  Future<List<LessonModel>> getLessons(String courseId);
+
+  Future<void> completeLesson(String lessonId);
 
   LessonNavigation getLessonNavigation(String currentLessonId);
 
   Future<SubscribeModel> subscribe(String courseId);
 
   Future<SubscribeModel> unsubscribe(String courseId);
-
-  Future logout();
 }
 
 class CoursesRepositoryImpl implements CoursesRepository {
   final CoursesApi api;
   final LessonsStoreService lessonsStore;
-  final AuthRepository authRepository;
 
-  CoursesRepositoryImpl(this.api, this.lessonsStore, this.authRepository);
+  CoursesRepositoryImpl(this.api, this.lessonsStore);
 
   @override
   Future<CoursesModel> getAllCourses() async {
@@ -35,9 +38,27 @@ class CoursesRepositoryImpl implements CoursesRepository {
   }
 
   @override
+  Future<CoursesModel> getMySubscriptions() async {
+    return await api.getMySubscriptions();
+  }
+
+  @override
   Future<CourseDetailsModel> getCourseById(String courseId) async {
     final result = await api.getCourseById(courseId);
     return result;
+  }
+
+  @override
+  Future<List<LessonModel>> getLessons(String courseId) async {
+    final lessons = await api.getLessons(courseId);
+    lessonsStore.setLessons(lessons);
+    return lessons;
+  }
+
+  @override
+  Future<void> completeLesson(String lessonId) async {
+    await api.completeLesson(lessonId);
+    lessonsStore.markCompleted(lessonId);
   }
 
   @override
@@ -59,8 +80,4 @@ class CoursesRepositoryImpl implements CoursesRepository {
     return result;
   }
 
-  @override
-  Future<dynamic> logout() async {
-    await authRepository.logout();
-  }
 }

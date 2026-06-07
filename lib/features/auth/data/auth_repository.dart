@@ -3,6 +3,7 @@ import 'package:edtech/features/auth/data/auth_api.dart';
 
 import '../../../core/services/token/token_service.dart';
 import '../../../core/utils/my_logger.dart';
+import '../models/password_reset_model.dart';
 import '../models/register_model.dart';
 import '../models/token_model.dart';
 
@@ -17,6 +18,14 @@ abstract class AuthRepository {
     required String lastName,
     required String password,
     required String phone,
+  });
+
+  Future<PasswordResetModel> forgotPassword(String email);
+
+  Future<void> resetPassword({
+    required String uid,
+    required String token,
+    required String newPassword,
   });
 }
 
@@ -36,6 +45,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return guard<TokenModel>(() async {
       final token = await api.login(email, password);
       await tokenService.setAccess(token.access);
+      await tokenService.setRefresh(token.refresh);
 
       logger.i("$this.login ended");
 
@@ -71,6 +81,29 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<dynamic> logout() async {
     logger.i("$this .logout() ");
-    await tokenService.deleteAccess();
+    await tokenService.deleteAll();
+  }
+
+  @override
+  Future<PasswordResetModel> forgotPassword(String email) async {
+    logger.i("$this.forgotPassword() started");
+    return guard<PasswordResetModel>(() async {
+      final result = await api.forgotPassword(email);
+      logger.i("$this.forgotPassword() ended");
+      return result;
+    });
+  }
+
+  @override
+  Future<void> resetPassword({
+    required String uid,
+    required String token,
+    required String newPassword,
+  }) async {
+    logger.i("$this.resetPassword() started");
+    await guard<void>(() async {
+      await api.resetPassword(uid: uid, token: token, newPassword: newPassword);
+      logger.i("$this.resetPassword() ended");
+    });
   }
 }

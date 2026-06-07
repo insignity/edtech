@@ -10,6 +10,9 @@ import 'core/utils/my_logger.dart';
 import 'features/auth/ui/bloc/auth_bloc.dart';
 import 'features/courses/ui/bloc/course_details/course_details_bloc.dart';
 import 'features/courses/ui/bloc/courses/courses_bloc.dart';
+import 'features/courses/ui/bloc/lesson/lesson_bloc.dart';
+import 'features/my_courses/ui/bloc/my_courses_bloc.dart';
+import 'features/quiz/bloc/quiz_bloc.dart';
 import 'features/profile/ui/bloc/profile_bloc.dart';
 
 void main() {
@@ -31,6 +34,9 @@ void main() {
         BlocProvider(create: (_) => sl<ProfileBloc>()),
         BlocProvider(create: (_) => sl<CoursesBloc>()),
         BlocProvider(create: (_) => sl<CourseDetailsBloc>()),
+        BlocProvider(create: (_) => sl<MyCoursesBloc>()),
+        BlocProvider(create: (_) => sl<LessonBloc>()),
+        BlocProvider(create: (_) => sl<QuizBloc>()),
       ],
       child: MyApp(),
     ),

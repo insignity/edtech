@@ -15,6 +15,7 @@ class CourseDetailsError extends CourseDetailsState {
 
 class CourseDetailsLoaded extends CourseDetailsState {
   final CourseDetailsModel course;
+  final List<LessonModel> lessons;
 
-  CourseDetailsLoaded(this.course);
+  CourseDetailsLoaded(this.course, {this.lessons = const []});
 }

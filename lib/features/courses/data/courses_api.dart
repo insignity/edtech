@@ -1,4 +1,5 @@
 import 'package:edtech/core/utils/types.dart';
+import 'package:edtech/features/courses/models/lesson_model.dart';
 import 'package:edtech/features/courses/models/subscribe_model.dart';
 
 import '../../../core/api/api_client.dart';
@@ -31,6 +32,13 @@ class CoursesApi {
     });
   }
 
+  Future<CoursesModel> getMySubscriptions() async {
+    return guard<CoursesModel>(() async {
+      final response = await api.get('/courses/my-subscriptions/');
+      return CoursesModel.fromJson(response.data as Json);
+    });
+  }
+
   Future<CourseDetailsModel> getCourseById(String courseId) async {
     return guard<CourseDetailsModel>(() async {
       final response = await api.get('/courses/$courseId');
@@ -38,6 +46,21 @@ class CoursesApi {
       final result = CourseDetailsModel.fromJson(response.data as Json);
 
       return result;
+    });
+  }
+
+  Future<void> completeLesson(String lessonId) async {
+    return guard<void>(() async {
+      await api.post('/lessons/$lessonId/complete/');
+    });
+  }
+
+  Future<List<LessonModel>> getLessons(String courseId) async {
+    return guard<List<LessonModel>>(() async {
+      final response = await api.get('/lessons/', params: {'course': courseId});
+      final data = response.data as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>;
+      return results.map((e) => LessonModel.fromJson(e as Map<String, dynamic>)).toList();
     });
   }
 

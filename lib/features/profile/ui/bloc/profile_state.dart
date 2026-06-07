@@ -18,4 +18,3 @@ class ProfileLoaded extends ProfileState {
   ProfileLoaded(this.user);
 }
 
-class ProfileLoggedOut extends ProfileState {}

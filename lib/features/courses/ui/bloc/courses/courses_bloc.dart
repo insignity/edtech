@@ -28,7 +28,6 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
       emit(CoursesLoaded(result));
     } catch (e, st) {
       emit(CoursesError(e.toString()));
-      await repository.logout();
-    } finally {}
+    }
   }
 }

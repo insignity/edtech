@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:edtech/core/router/app_router.dart';
+import 'package:edtech/core/theme/app_themes.dart';
+import 'package:edtech/features/auth/ui/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,84 +29,89 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: SafeArea(
-        child: BlocConsumer<ProfileBloc, ProfileState>(
-          listener: (c, state) {
-            if (state is ProfileLoggedOut) {
+        child: BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthLoggedOut) {
               context.router.replaceAll([LoginRoute()]);
             }
           },
-          builder: (context, state) {
-            if (state is ProfileLoaded) {
-              final user = state.user;
+          child: BlocConsumer<ProfileBloc, ProfileState>(
+            listener: (c, state) {},
+            builder: (context, state) {
+              if (state is ProfileLoaded) {
+                final user = state.user;
 
-              final fullName = [
-                user.firstName,
-                user.lastName,
-              ].where((e) => e != null && e.isNotEmpty).join(' ');
+                final fullName = [
+                  user.firstName,
+                  user.lastName,
+                ].where((e) => e != null && e.isNotEmpty).join(' ');
 
-              final imageUrl = user.avatarUrl ?? user.avatar;
+                final imageUrl = user.avatarUrl ?? user.avatar;
 
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 48,
-                      backgroundColor: Colors.grey.shade200,
-                      backgroundImage: imageUrl != null
-                          ? NetworkImage(imageUrl)
-                          : null,
-                      child: imageUrl == null
-                          ? const Icon(Icons.person, size: 48)
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      fullName.isEmpty ? 'No name' : fullName,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user.email,
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-                    const SizedBox(height: 24),
-                    _infoTile(
-                      icon: Icons.phone,
-                      label: 'Phone',
-                      value: user.phone ?? 'Not provided',
-                    ),
-                    const SizedBox(height: 12),
-                    _infoTile(
-                      icon: Icons.location_city,
-                      label: 'City',
-                      value: user.city ?? 'Not provided',
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          bloc.add(LogoutProfile());
-                        },
-                        child: const Text("Log out"),
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 48,
+                        backgroundColor: Colors.grey.shade200,
+                        backgroundImage: imageUrl != null
+                            ? NetworkImage(imageUrl)
+                            : null,
+                        child: imageUrl == null
+                            ? const Icon(Icons.person, size: 48)
+                            : null,
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }
+                      const SizedBox(height: 16),
+                      Text(
+                        fullName.isEmpty ? 'No name' : fullName,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        user.email,
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      const SizedBox(height: 24),
+                      _infoTile(
+                        icon: Icons.phone,
+                        label: 'Phone',
+                        value: user.phone ?? 'Not provided',
+                      ),
+                      const SizedBox(height: 12),
+                      _infoTile(
+                        icon: Icons.location_city,
+                        label: 'City',
+                        value: user.city ?? 'Not provided',
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () => context.read<AuthBloc>().add(Logout()),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                            side: const BorderSide(color: AppColors.error),
+                          ),
+                          child: const Text('Log out'),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-            if (state is ProfileLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+              if (state is ProfileLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            if (state is ProfileError) {
-              return const Center(child: Text("Something went wrong"));
-            }
+              if (state is ProfileError) {
+                return const Center(child: Text("Something went wrong"));
+              }
 
-            return const SizedBox();
-          },
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );

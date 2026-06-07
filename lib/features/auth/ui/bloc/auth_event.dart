@@ -14,7 +14,7 @@ class Register extends AuthEvent {
 
   @override
   String toString(){
-    return "Register(email: $email, password: $password, firstName: $firstName, lastName: $lastName, phone: $phone)";
+    return "Register(email: $email, firstName: $firstName, lastName: $lastName, phone: $phone)";
   }
 }
 
@@ -26,6 +26,27 @@ class Login extends AuthEvent{
 
   @override
   String toString(){
-    return "Login(email: $email, password: $password)";
+    return "Login(email: $email)";
   }
+}
+
+class Logout extends AuthEvent {}
+
+class ForgotPassword extends AuthEvent {
+  final String email;
+  ForgotPassword({required this.email});
+
+  @override
+  String toString() => 'ForgotPassword(email: $email)';
+}
+
+class ResetPassword extends AuthEvent {
+  final String uid;
+  final String token;
+  final String newPassword;
+
+  ResetPassword({required this.uid, required this.token, required this.newPassword});
+
+  @override
+  String toString() => 'ResetPassword(uid: $uid)';
 }

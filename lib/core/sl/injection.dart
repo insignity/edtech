@@ -14,7 +14,12 @@ import 'package:get_it/get_it.dart';
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/ui/bloc/auth_bloc.dart';
 import '../../features/courses/ui/bloc/courses/courses_bloc.dart';
+import '../../features/courses/ui/bloc/lesson/lesson_bloc.dart';
+import '../../features/my_courses/ui/bloc/my_courses_bloc.dart';
 import '../../features/profile/ui/bloc/profile_bloc.dart';
+import '../../features/quiz/bloc/quiz_bloc.dart';
+import '../../features/quiz/data/quiz_api.dart';
+import '../../features/quiz/data/quiz_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -44,16 +49,23 @@ void injectServiceLocator() {
     () => ProfileRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<CoursesRepository>(
-    () => CoursesRepositoryImpl(sl(), sl(), sl()),
+    () => CoursesRepositoryImpl(sl(), sl()),
   );
   //bloc
   sl.registerFactory<AuthBloc>(() => AuthBloc(sl()));
   sl.registerFactory<ProfileBloc>(() => ProfileBloc(sl()));
   sl.registerFactory<CoursesBloc>(() => CoursesBloc(sl()));
   sl.registerFactory<CourseDetailsBloc>(() => CourseDetailsBloc(sl()));
+  sl.registerFactory<MyCoursesBloc>(() => MyCoursesBloc(sl()));
+  sl.registerFactory<LessonBloc>(() => LessonBloc(sl()));
 
   //api
   sl.registerLazySingleton<AuthApi>(() => AuthApi(sl()));
-  sl.registerLazySingleton<ProfileApi>(() => ProfileApi(sl(), sl()));
+  sl.registerLazySingleton<ProfileApi>(() => ProfileApi(sl()));
   sl.registerLazySingleton<CoursesApi>(() => CoursesApi(sl()));
+  sl.registerLazySingleton<QuizApi>(() => QuizApi(sl()));
+
+  // quiz
+  sl.registerLazySingleton<QuizRepository>(() => QuizRepositoryImpl(sl()));
+  sl.registerFactory<QuizBloc>(() => QuizBloc(sl()));
 }

@@ -9,6 +9,24 @@ class LessonsStoreService {
     _lessons = lessons;
   }
 
+  void markCompleted(String lessonId) {
+    _lessons = _lessons.map((lesson) {
+      if (lesson.id == lessonId) {
+        return LessonModel(
+          id: lesson.id,
+          name: lesson.name,
+          description: lesson.description,
+          video: lesson.video,
+          previewUrl: lesson.previewUrl,
+          course: lesson.course,
+          owner: lesson.owner,
+          isCompleted: true,
+        );
+      }
+      return lesson;
+    }).toList();
+  }
+
   LessonNavigation getLessonNavigation(String currentLessonId) {
     final index = _lessons.indexWhere((e) => e.id == currentLessonId);
 

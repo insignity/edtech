@@ -41,6 +41,8 @@ dependencies:
   logger: ^2.7.0
   flutter_secure_storage: ^10.0.0
   video_player: ^2.11.1
+  youtube_player_flutter: ^10.0.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

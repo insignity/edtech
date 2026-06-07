@@ -1,10 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:edtech/core/router/app_router.dart';
+import 'package:edtech/core/theme/app_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/sl/injection.dart';
-import '../../../core/theme/app_themes.dart';
 import '../../../shared/extensions/extensions.dart';
 import 'bloc/auth_bloc.dart';
 
@@ -19,6 +19,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   late final AuthBloc bloc = sl<AuthBloc>();
   final GlobalKey<FormState> _formKey = GlobalKey();
+  bool _obscurePassword = true;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
@@ -33,152 +34,153 @@ class _RegisterPageState extends State<RegisterPage> {
       listener: (context, state) {
         if (state is AuthSuccess) {
           context.router.replace(const LoginRoute());
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
         }
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.background,
           body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Form(
-                    key: _formKey,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
                     child: ListView(
-                      padding: EdgeInsets.zero,
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       children: [
-                        Text(
-                          'Sign up',
-                          style:
-                              context.text.headlineMedium! + AppColors.primary,
-                          textAlign: TextAlign.center,
+                        const SizedBox(height: 40),
+                        Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(Icons.school_rounded, color: AppColors.white, size: 40),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 12,
-                            left: 16,
-                            right: 16,
-                          ),
-                          child: TextFormField(
-                            controller: firstNameController,
-                            decoration: const InputDecoration().copyWith(
-                              label: const Text('First name'),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 12,
-                            left: 16,
-                            right: 16,
-                          ),
-                          child: TextFormField(
-                            controller: lastNameController,
-                            decoration: const InputDecoration().copyWith(
-                              label: const Text('Last name'),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            top: 12,
-                            right: 16,
-                          ),
-                          child: TextFormField(
-                            controller: phoneController,
-                            decoration: const InputDecoration(
-                              label: Text('Phone'),
-                            ),
-                          ),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            top: 12,
-                            right: 16,
-                          ),
-                          child: TextFormField(
-                            controller: emailController,
-                            decoration: InputDecoration(
-                              label: Row(
-                                children: [
-                                  Text('Email', style: context.text.bodyMedium),
-                                  Text(
-                                    '*',
-                                    style:
-                                        context.text.bodyMedium! +
-                                        AppColors.red,
-                                  ),
-                                ],
+                        const SizedBox(height: 24),
+                        Text('Create account', style: context.text.headlineMedium),
+                        const SizedBox(height: 6),
+                        Text('Start your learning journey today', style: context.text.bodyMedium),
+                        const SizedBox(height: 32),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: firstNameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'First name',
+                                  prefixIcon: Icon(Icons.person_outline),
+                                ),
                               ),
                             ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: TextFormField(
+                                controller: lastNameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Last name',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: const InputDecoration(
+                            labelText: 'Phone',
+                            prefixIcon: Icon(Icons.phone_outlined),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            top: 12,
-                            right: 16,
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: const InputDecoration(
+                            labelText: 'Email *',
+                            prefixIcon: Icon(Icons.email_outlined),
                           ),
-                          child: TextFormField(
-                            controller: passwordController,
-                            decoration: const InputDecoration(
-                              label: Text('Password'),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: _obscurePassword,
+                          decoration: InputDecoration(
+                            labelText: 'Password *',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined),
+                              onPressed: () =>
+                                  setState(() => _obscurePassword = !_obscurePassword),
                             ),
-                            obscureText: true,
-                            obscuringCharacter: '*',
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Have an account? ', style: context.text.bodyMedium),
+                        GestureDetector(
+                          onTap: () => context.router.replace(LoginRoute()),
+                          child: Text(
+                            'Sign In',
+                            style: context.text.bodyMedium! + AppColors.primary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Have an account? '),
-                      GestureDetector(
-                        onTap: () {
-                          context.router.replace(LoginRoute());
-                        },
-                        child: Text('Sign In'),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 44,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        bloc.add(
-                          Register(
-                            email: emailController.text,
-                            password: passwordController.text,
-                            firstName: firstNameController.text,
-                            lastName: lastNameController.text,
-                            phone: phoneController.text,
-                          ),
-                        );
-                      }
-                    }, //login,
-                    child: Builder(
-                      builder: (context) {
-                        return const Text('SIGN UP');
-                      },
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 32),
+                    child: ElevatedButton(
+                      onPressed: state is AuthLoading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                bloc.add(
+                                  Register(
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text,
+                                    firstName: firstNameController.text,
+                                    lastName: lastNameController.text,
+                                    phone: phoneController.text,
+                                  ),
+                                );
+                              }
+                            },
+                      child: state is AuthLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.white,
+                              ),
+                            )
+                          : const Text('CREATE ACCOUNT'),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

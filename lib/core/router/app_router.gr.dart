@@ -78,6 +78,74 @@ class CoursesRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ForgotPasswordPage]
+class ForgotPasswordRoute extends PageRouteInfo<void> {
+  const ForgotPasswordRoute({List<PageRouteInfo>? children})
+    : super(ForgotPasswordRoute.name, initialChildren: children);
+
+  static const String name = 'ForgotPasswordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ForgotPasswordPage();
+    },
+  );
+}
+
+/// generated route for
+/// [LessonPage]
+class LessonRoute extends PageRouteInfo<LessonRouteArgs> {
+  LessonRoute({
+    Key? key,
+    required String lessonId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         LessonRoute.name,
+         args: LessonRouteArgs(key: key, lessonId: lessonId),
+         rawPathParams: {'lessonId': lessonId},
+         initialChildren: children,
+       );
+
+  static const String name = 'LessonRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<LessonRouteArgs>(
+        orElse: () =>
+            LessonRouteArgs(lessonId: pathParams.getString('lessonId')),
+      );
+      return LessonPage(key: args.key, lessonId: args.lessonId);
+    },
+  );
+}
+
+class LessonRouteArgs {
+  const LessonRouteArgs({this.key, required this.lessonId});
+
+  final Key? key;
+
+  final String lessonId;
+
+  @override
+  String toString() {
+    return 'LessonRouteArgs{key: $key, lessonId: $lessonId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! LessonRouteArgs) return false;
+    return key == other.key && lessonId == other.lessonId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ lessonId.hashCode;
+}
+
+/// generated route for
 /// [LoginPage]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})
@@ -142,6 +210,54 @@ class ProfileRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [QuizPage]
+class QuizRoute extends PageRouteInfo<QuizRouteArgs> {
+  QuizRoute({Key? key, required String lessonId, List<PageRouteInfo>? children})
+    : super(
+        QuizRoute.name,
+        args: QuizRouteArgs(key: key, lessonId: lessonId),
+        rawPathParams: {'lessonId': lessonId},
+        initialChildren: children,
+      );
+
+  static const String name = 'QuizRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<QuizRouteArgs>(
+        orElse: () => QuizRouteArgs(lessonId: pathParams.getString('lessonId')),
+      );
+      return QuizPage(key: args.key, lessonId: args.lessonId);
+    },
+  );
+}
+
+class QuizRouteArgs {
+  const QuizRouteArgs({this.key, required this.lessonId});
+
+  final Key? key;
+
+  final String lessonId;
+
+  @override
+  String toString() {
+    return 'QuizRouteArgs{key: $key, lessonId: $lessonId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! QuizRouteArgs) return false;
+    return key == other.key && lessonId == other.lessonId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ lessonId.hashCode;
+}
+
+/// generated route for
 /// [RegisterPage]
 class RegisterRoute extends PageRouteInfo<void> {
   const RegisterRoute({List<PageRouteInfo>? children})
@@ -155,4 +271,61 @@ class RegisterRoute extends PageRouteInfo<void> {
       return const RegisterPage();
     },
   );
+}
+
+/// generated route for
+/// [ResetPasswordPage]
+class ResetPasswordRoute extends PageRouteInfo<ResetPasswordRouteArgs> {
+  ResetPasswordRoute({
+    Key? key,
+    String uid = '',
+    String token = '',
+    List<PageRouteInfo>? children,
+  }) : super(
+         ResetPasswordRoute.name,
+         args: ResetPasswordRouteArgs(key: key, uid: uid, token: token),
+         rawQueryParams: {'uid': uid, 'token': token},
+         initialChildren: children,
+       );
+
+  static const String name = 'ResetPasswordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final queryParams = data.queryParams;
+      final args = data.argsAs<ResetPasswordRouteArgs>(
+        orElse: () => ResetPasswordRouteArgs(
+          uid: queryParams.getString('uid', ''),
+          token: queryParams.getString('token', ''),
+        ),
+      );
+      return ResetPasswordPage(key: args.key, uid: args.uid, token: args.token);
+    },
+  );
+}
+
+class ResetPasswordRouteArgs {
+  const ResetPasswordRouteArgs({this.key, this.uid = '', this.token = ''});
+
+  final Key? key;
+
+  final String uid;
+
+  final String token;
+
+  @override
+  String toString() {
+    return 'ResetPasswordRouteArgs{key: $key, uid: $uid, token: $token}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ResetPasswordRouteArgs) return false;
+    return key == other.key && uid == other.uid && token == other.token;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ uid.hashCode ^ token.hashCode;
 }

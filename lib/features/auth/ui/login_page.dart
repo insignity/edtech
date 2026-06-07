@@ -3,7 +3,6 @@ import 'package:edtech/core/router/app_router.dart';
 import 'package:edtech/core/theme/app_themes.dart';
 import 'package:edtech/core/utils/validators/email_validator.dart';
 import 'package:edtech/core/widgets/keyboard_hider.dart';
-import 'package:edtech/features/auth/ui/widgets/welcome_video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,166 +20,151 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> with EmailValidator {
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final GlobalKey<FormState> _formKey = GlobalKey();
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Form(
           key: _formKey,
           child: KeyboardHider(
             child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  WelcomeVideo(),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(
-                        Login(email: "aero@mail.ru", password: "aeroaero123"),
-                      );
-                    },
-                    child: Text("Login cheatcode"),
+                  const SizedBox(height: 48),
+                  // Logo
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(Icons.school_rounded, color: AppColors.white, size: 40),
                   ),
+                  const SizedBox(height: 24),
                   Text(
-                    'Sign In',
-                    style: context.text.headlineMedium! + AppColors.primary,
-                    textAlign: TextAlign.center,
+                    'Welcome back!',
+                    style: context.text.headlineMedium,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      top: 12,
-                      right: 16,
+                  const SizedBox(height: 6),
+                  Text(
+                    'Sign in to continue learning',
+                    style: context.text.bodyMedium,
+                  ),
+                  const SizedBox(height: 36),
+                  TextFormField(
+                    controller: emailController,
+                    validator: validateEmail,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email_outlined),
                     ),
-                    child: TextFormField(
-                      controller: emailController,
-                      validator: validateEmail,
-                      decoration: InputDecoration(
-                        label: Row(
-                          children: [
-                            Text('Email'),
-                            Text('*', style: TextStyle() + AppColors.red),
-                          ],
-                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: passwordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined),
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      top: 12,
-                      right: 16,
-                    ),
-                    child: TextFormField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                        label: Row(
-                          children: [
-                            Text('Password'),
-                            Text('*', style: TextStyle() + AppColors.red),
-                          ],
-                        ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () => context.router.push(const ForgotPasswordRoute()),
+                      child: Text(
+                        'Forgot password?',
+                        style: context.text.bodyMedium! + AppColors.primary,
                       ),
-                      obscureText: true,
-                      obscuringCharacter: '*',
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Padding(
-                    padding: EdgeInsets.only(top: 8, left: 16, right: 16),
+                    padding: const EdgeInsets.only(top: 4),
                     child: RichText(
                       text: TextSpan(
-                        style:
-                            context.text.bodyMedium! +
-                            AppColors.gray.withAlpha(150),
+                        style: context.text.bodyMedium,
                         children: [
-                          TextSpan(text: 'By continuing, you agree to our '),
+                          const TextSpan(text: 'By continuing, you agree to our '),
                           TextSpan(
                             text: 'Terms of Use',
-                            style:
-                                context.text.bodyMedium! +
-                                AppColors.primary.withAlpha(150),
+                            style: context.text.bodyMedium! + AppColors.primary,
                           ),
                           const TextSpan(text: ' and '),
                           TextSpan(
                             text: 'Privacy Policy.',
-                            style:
-                                context.text.bodyMedium! +
-                                AppColors.primary.withAlpha(150),
+                            style: context.text.bodyMedium! + AppColors.primary,
                           ),
                         ],
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12, top: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account? ",
-                          style: context.text.bodyLarge!,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            context.router.replace(RegisterRoute());
-                          },
-                          child: Text(
-                            'Sign up',
-                            style: context.text.bodyLarge! + AppColors.primary,
+                  const SizedBox(height: 28),
+                  BlocListener<AuthBloc, AuthState>(
+                    listener: (_, state) {
+                      if (state is AuthSuccess) {
+                        context.router.replaceAll([NavBarRoute()]);
+                      } else if (state is AuthError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                            backgroundColor: AppColors.error,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 44,
-                    ),
-                    child: BlocListener<AuthBloc, AuthState>(
-                      listener: (_, state) {
-                        if (state is AuthSuccess) {
-                          context.router.replaceAll([CoursesRoute()]);
-                        } else if (state is AuthError) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text('Error'),
-                                content: Text(state.message),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => context.router.pop(),
-                                    child: Text('OK'),
-                                  ),
-                                ],
+                        );
+                      }
+                    },
+                    child: BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        return AuthButton(
+                          onPressed: state is AuthLoading ? null : () {
+                            if (_formKey.currentState!.validate()) {
+                              context.read<AuthBloc>().add(
+                                Login(
+                                  email: emailController.text.trim(),
+                                  password: passwordController.text,
+                                ),
                               );
-                            },
-                          );
-                        }
+                            }
+                          },
+                          text: state is AuthLoading ? "Signing in..." : "SIGN IN",
+                        );
                       },
-                      child: AuthButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            context.read<AuthBloc>().add(
-                              Login(
-                                email: emailController.text,
-                                password: passwordController.text,
-                              ),
-                            );
-                          }
-                        },
-                        text: "SIGN IN",
-                      ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Don't have an account? ", style: context.text.bodyMedium),
+                      GestureDetector(
+                        onTap: () => context.router.replace(RegisterRoute()),
+                        child: Text(
+                          'Sign up',
+                          style: context.text.bodyMedium! +
+                              AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
