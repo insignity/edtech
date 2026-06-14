@@ -1,4 +1,5 @@
 import 'package:edtech/core/api/api_client.dart';
+import 'package:edtech/core/constants/constants.dart';
 import 'package:edtech/core/router/guards/auth_guard.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 import 'package:edtech/features/auth/data/auth_api.dart';
@@ -38,7 +39,7 @@ void injectServiceLocator() {
 
   //api
   sl.registerLazySingleton<ApiClient>(
-    () => ApiClient("http://45.12.231.230:8000/api", tokenService: sl()),
+    () => ApiClient(Constants.url, tokenService: sl()),
   );
 
   //repositories
