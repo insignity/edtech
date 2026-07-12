@@ -18,3 +18,13 @@ class ProfileLoaded extends ProfileState {
   ProfileLoaded(this.user);
 }
 
+class ProfileDeleting extends ProfileState {}
+
+class ProfileDeleted extends ProfileState {}
+
+class ProfileDeleteError extends ProfileState {
+  final String message;
+
+  ProfileDeleteError(this.message);
+}
+

@@ -6,6 +6,8 @@ import '../../../core/utils/my_logger.dart';
 
 abstract class ProfileRepository {
   Future<UserModel> fetchProfile();
+
+  Future<void> deleteAccount();
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -23,6 +25,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
       logger.i("$this.fetchProfile() ended");
 
       return response;
+    });
+  }
+
+  @override
+  Future<void> deleteAccount() {
+    logger.i("$this.deleteAccount() started");
+
+    return guard<void>(() async {
+      await api.deleteAccount();
+
+      logger.i("$this.deleteAccount() ended");
     });
   }
 }

@@ -12,4 +12,8 @@ class ProfileApi {
     final response = await client.get("/profile/", putToken: true);
     return UserModel.fromJson(response.data as Json);
   }
+
+  Future<void> deleteAccount() async {
+    await client.delete("/delete-account/");
+  }
 }

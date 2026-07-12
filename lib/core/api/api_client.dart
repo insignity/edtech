@@ -60,6 +60,24 @@ class ApiClient {
       throw ApiException.fromDio(e);
     }
   }
+
+  Future<Response> delete(
+    String path, {
+    Json? params,
+    Json? data,
+    bool putToken = true,
+  }) async {
+    try {
+      return await _dio.delete(
+        path,
+        queryParameters: params,
+        data: data,
+        options: Options(extra: {'putToken': putToken}),
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 }
 
 class ApiException implements Exception {

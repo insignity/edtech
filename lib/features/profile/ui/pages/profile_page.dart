@@ -36,7 +36,20 @@ class _ProfilePageState extends State<ProfilePage> {
             }
           },
           child: BlocConsumer<ProfileBloc, ProfileState>(
-            listener: (c, state) {},
+            listener: (context, state) {
+              if (state is ProfileDeleted) {
+                // account is gone on the server — clear tokens and leave
+                context.read<AuthBloc>().add(Logout());
+              }
+              if (state is ProfileDeleteError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to delete account: ${state.message}'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            },
             builder: (context, state) {
               if (state is ProfileLoaded) {
                 final user = state.user;
@@ -96,12 +109,20 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: const Text('Log out'),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => _showDeleteAccountDialog(context),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.error,
+                        ),
+                        child: const Text('Delete Account'),
+                      ),
                     ],
                   ),
                 );
               }
 
-              if (state is ProfileLoading) {
+              if (state is ProfileLoading || state is ProfileDeleting) {
                 return const Center(child: CircularProgressIndicator());
               }
 
@@ -113,6 +134,18 @@ class _ProfilePageState extends State<ProfilePage> {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _DeleteAccountDialog(
+        onConfirm: () {
+          Navigator.of(dialogContext).pop();
+          bloc.add(DeleteAccount());
+        },
       ),
     );
   }
@@ -153,6 +186,85 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DeleteAccountDialog extends StatefulWidget {
+  final VoidCallback onConfirm;
+
+  const _DeleteAccountDialog({required this.onConfirm});
+
+  @override
+  State<_DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
+  final _controller = TextEditingController();
+  bool _confirmed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      final matches = _controller.text.trim().toLowerCase() == 'delete';
+      if (matches != _confirmed) {
+        setState(() => _confirmed = matches);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: AppColors.error),
+          SizedBox(width: 8),
+          Expanded(child: Text('Delete Account?')),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'This will permanently delete your account, subscriptions, '
+            'and learning progress. This action cannot be undone.',
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Type "delete" to confirm:',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'delete'),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: _confirmed ? widget.onConfirm : null,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.error,
+            disabledBackgroundColor: AppColors.error.withValues(alpha: 0.3),
+          ),
+          child: const Text('Delete Forever'),
+        ),
+      ],
     );
   }
 }
