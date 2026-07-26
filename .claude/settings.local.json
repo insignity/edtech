@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la ~/.claude/projects/ 2>/dev/null | head -30; echo \"---MEMORY---\"; ls -la ~/.claude/projects/-Users-aero-IdeaProjects-edtech/memory/ 2>/dev/null)"
+    ]
+  }
+}
