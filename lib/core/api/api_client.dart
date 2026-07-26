@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:edtech/core/api/interceptors/token_interceptor.dart';
+import 'package:edtech/core/services/session/session_events.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 
 import '../utils/types.dart';
@@ -8,19 +9,28 @@ import 'interceptors/curl_interceptor.dart';
 class ApiClient {
   final Dio _dio;
   final TokenService _tokenService;
+  final SessionEvents _sessionEvents;
 
-  ApiClient(String baseUrl, {required TokenService tokenService})
-    : _tokenService = tokenService,
-      _dio = Dio(
-        BaseOptions(
-          baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          headers: {'Content-Type': 'application/json'},
-        ),
-      ) {
+  ApiClient(
+    String baseUrl, {
+    required TokenService tokenService,
+    required SessionEvents sessionEvents,
+  }) : _tokenService = tokenService,
+       _sessionEvents = sessionEvents,
+       _dio = Dio(
+         BaseOptions(
+           baseUrl: baseUrl,
+           connectTimeout: const Duration(seconds: 10),
+           receiveTimeout: const Duration(seconds: 10),
+           headers: {'Content-Type': 'application/json'},
+         ),
+       ) {
     _dio.interceptors.addAll([
-      TokenInterceptor(_tokenService, baseUrl: baseUrl),
+      TokenInterceptor(
+        _tokenService,
+        baseUrl: baseUrl,
+        sessionEvents: _sessionEvents,
+      ),
       CurlInterceptor(),
     ]);
   }

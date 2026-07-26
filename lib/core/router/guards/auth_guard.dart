@@ -13,8 +13,9 @@ class AuthGuard extends AutoRouteGuard {
     NavigationResolver resolver,
     StackRouter router,
   ) async {
-    final hasToken = await tokenService.hasAccessToken();
-    if (hasToken) {
+    // Presence of a token proves nothing — an expired one is still a string.
+    final hasSession = await tokenService.hasValidSession();
+    if (hasSession) {
       resolver.next();
     } else {
       await router.push(const LoginRoute());

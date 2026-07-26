@@ -1,17 +1,22 @@
 import 'package:dio/dio.dart';
+import 'package:edtech/core/services/session/session_events.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 
 import '../../utils/my_logger.dart';
 
 class TokenInterceptor implements Interceptor {
   final TokenService tokenService;
+  final SessionEvents sessionEvents;
 
   // A separate bare Dio instance just for the refresh call — no interceptors
   // to avoid infinite loops if /token/refresh/ itself returns 401.
   final Dio _refreshDio;
 
-  TokenInterceptor(this.tokenService, {required String baseUrl})
-      : _refreshDio = Dio(BaseOptions(
+  TokenInterceptor(
+    this.tokenService, {
+    required String baseUrl,
+    required this.sessionEvents,
+  }) : _refreshDio = Dio(BaseOptions(
           baseUrl: baseUrl,
           headers: {'Content-Type': 'application/json'},
         ));
@@ -50,6 +55,7 @@ class TokenInterceptor implements Interceptor {
     if (refreshToken == null || refreshToken.isEmpty) {
       logger.w('No refresh token — clearing session');
       await tokenService.deleteAll();
+      sessionEvents.notifyExpired();
       handler.next(err);
       return;
     }
@@ -73,6 +79,7 @@ class TokenInterceptor implements Interceptor {
     } catch (e) {
       logger.e('Token refresh failed — clearing session', error: e);
       await tokenService.deleteAll();
+      sessionEvents.notifyExpired();
       handler.next(err);
     }
   }

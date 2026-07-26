@@ -1,3 +1,4 @@
+import 'package:edtech/core/services/token/jwt.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class TokenService {
@@ -5,6 +6,13 @@ abstract class TokenService {
   Future setAccess(String value);
   Future deleteAccess();
   Future<bool> hasAccessToken();
+
+  /// Whether the session is still usable — either the access token is live, or
+  /// the refresh token is, so the interceptor can renew it on the next call.
+  ///
+  /// Prefer this over [hasAccessToken] for gating navigation: a stale access
+  /// token is still a non-empty string, so presence alone proves nothing.
+  Future<bool> hasValidSession();
 
   Future<String?> getRefresh();
   Future setRefresh(String value);
@@ -34,6 +42,16 @@ class TokenServiceImpl implements TokenService {
   Future<bool> hasAccessToken() async {
     final response = await getAccess();
     return response != null && response.isNotEmpty;
+  }
+
+  @override
+  Future<bool> hasValidSession() async {
+    final access = await getAccess();
+    if (access != null && access.isNotEmpty && !Jwt.isExpired(access)) {
+      return true;
+    }
+    final refresh = await getRefresh();
+    return refresh != null && refresh.isNotEmpty && !Jwt.isExpired(refresh);
   }
 
   @override

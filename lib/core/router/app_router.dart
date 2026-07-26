@@ -9,7 +9,9 @@ import '../../features/auth/ui/reset_password_page.dart';
 import '../../features/courses/ui/pages/course_detail_page.dart';
 import '../../features/courses/ui/pages/courses_page.dart';
 import '../../features/courses/ui/pages/lesson_page.dart';
-import '../../features/quiz/ui/quiz_page.dart';
+import '../../features/recording/models/retelling_result.dart';
+import '../../features/recording/ui/pages/recording_page.dart';
+import '../../features/recording/ui/pages/results_page.dart';
 import '../../features/my_courses/ui/pages/my_courses_page.dart';
 import '../../features/nav_bar/pages/nav_bar_page.dart';
 import '../../features/profile/ui/pages/profile_page.dart';
@@ -30,7 +32,8 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: ResetPasswordRoute.page, path: '/reset-password'),
     AutoRoute(page: CourseDetailsRoute.page, path: '/courses/:id'),
     AutoRoute(page: LessonRoute.page, path: '/lessons/:lessonId'),
-    AutoRoute(page: QuizRoute.page, path: '/lessons/:lessonId/quiz'),
+    AutoRoute(page: RecordingRoute.page, path: '/lessons/:lessonId/recording'),
+    AutoRoute(page: ResultsRoute.page, path: '/lessons/:lessonId/results'),
     AutoRoute(
       page: NavBarRoute.page,
       path: '/',

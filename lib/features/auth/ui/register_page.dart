@@ -4,7 +4,6 @@ import 'package:edtech/core/theme/app_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/sl/injection.dart';
 import '../../../shared/extensions/extensions.dart';
 import 'bloc/auth_bloc.dart';
 
@@ -17,7 +16,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  late final AuthBloc bloc = sl<AuthBloc>();
   final GlobalKey<FormState> _formKey = GlobalKey();
   bool _obscurePassword = true;
 
@@ -30,7 +28,6 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
-      bloc: bloc,
       listener: (context, state) {
         if (state is AuthSuccess) {
           context.router.replace(const LoginRoute());
@@ -156,7 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ? null
                           : () {
                               if (_formKey.currentState!.validate()) {
-                                bloc.add(
+                                context.read<AuthBloc>().add(
                                   Register(
                                     email: emailController.text.trim(),
                                     password: passwordController.text,

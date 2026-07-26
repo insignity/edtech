@@ -210,51 +210,74 @@ class ProfileRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [QuizPage]
-class QuizRoute extends PageRouteInfo<QuizRouteArgs> {
-  QuizRoute({Key? key, required String lessonId, List<PageRouteInfo>? children})
-    : super(
-        QuizRoute.name,
-        args: QuizRouteArgs(key: key, lessonId: lessonId),
-        rawPathParams: {'lessonId': lessonId},
-        initialChildren: children,
-      );
+/// [RecordingPage]
+class RecordingRoute extends PageRouteInfo<RecordingRouteArgs> {
+  RecordingRoute({
+    Key? key,
+    required String lessonId,
+    String lessonTitle = 'Retelling',
+    List<PageRouteInfo>? children,
+  }) : super(
+         RecordingRoute.name,
+         args: RecordingRouteArgs(
+           key: key,
+           lessonId: lessonId,
+           lessonTitle: lessonTitle,
+         ),
+         rawPathParams: {'lessonId': lessonId},
+         initialChildren: children,
+       );
 
-  static const String name = 'QuizRoute';
+  static const String name = 'RecordingRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
-      final args = data.argsAs<QuizRouteArgs>(
-        orElse: () => QuizRouteArgs(lessonId: pathParams.getString('lessonId')),
+      final args = data.argsAs<RecordingRouteArgs>(
+        orElse: () =>
+            RecordingRouteArgs(lessonId: pathParams.getString('lessonId')),
       );
-      return QuizPage(key: args.key, lessonId: args.lessonId);
+      return WrappedRoute(
+        child: RecordingPage(
+          key: args.key,
+          lessonId: args.lessonId,
+          lessonTitle: args.lessonTitle,
+        ),
+      );
     },
   );
 }
 
-class QuizRouteArgs {
-  const QuizRouteArgs({this.key, required this.lessonId});
+class RecordingRouteArgs {
+  const RecordingRouteArgs({
+    this.key,
+    required this.lessonId,
+    this.lessonTitle = 'Retelling',
+  });
 
   final Key? key;
 
   final String lessonId;
 
+  final String lessonTitle;
+
   @override
   String toString() {
-    return 'QuizRouteArgs{key: $key, lessonId: $lessonId}';
+    return 'RecordingRouteArgs{key: $key, lessonId: $lessonId, lessonTitle: $lessonTitle}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (other is! QuizRouteArgs) return false;
-    return key == other.key && lessonId == other.lessonId;
+    if (other is! RecordingRouteArgs) return false;
+    return key == other.key &&
+        lessonId == other.lessonId &&
+        lessonTitle == other.lessonTitle;
   }
 
   @override
-  int get hashCode => key.hashCode ^ lessonId.hashCode;
+  int get hashCode => key.hashCode ^ lessonId.hashCode ^ lessonTitle.hashCode;
 }
 
 /// generated route for
@@ -328,4 +351,76 @@ class ResetPasswordRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ uid.hashCode ^ token.hashCode;
+}
+
+/// generated route for
+/// [ResultsPage]
+class ResultsRoute extends PageRouteInfo<ResultsRouteArgs> {
+  ResultsRoute({
+    Key? key,
+    required RetellingResult result,
+    required String lessonId,
+    String lessonTitle = 'Retelling',
+    List<PageRouteInfo>? children,
+  }) : super(
+         ResultsRoute.name,
+         args: ResultsRouteArgs(
+           key: key,
+           result: result,
+           lessonId: lessonId,
+           lessonTitle: lessonTitle,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'ResultsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<ResultsRouteArgs>();
+      return ResultsPage(
+        key: args.key,
+        result: args.result,
+        lessonId: args.lessonId,
+        lessonTitle: args.lessonTitle,
+      );
+    },
+  );
+}
+
+class ResultsRouteArgs {
+  const ResultsRouteArgs({
+    this.key,
+    required this.result,
+    required this.lessonId,
+    this.lessonTitle = 'Retelling',
+  });
+
+  final Key? key;
+
+  final RetellingResult result;
+
+  final String lessonId;
+
+  final String lessonTitle;
+
+  @override
+  String toString() {
+    return 'ResultsRouteArgs{key: $key, result: $result, lessonId: $lessonId, lessonTitle: $lessonTitle}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ResultsRouteArgs) return false;
+    return key == other.key &&
+        result == other.result &&
+        lessonId == other.lessonId &&
+        lessonTitle == other.lessonTitle;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ result.hashCode ^ lessonId.hashCode ^ lessonTitle.hashCode;
 }

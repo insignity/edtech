@@ -64,7 +64,7 @@ abstract class AppThemes {
           GoogleFonts.manrope(fontWeight: FontWeight.w500, fontSize: 15),
         ),
         padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(vertical: 15),
+          EdgeInsets.symmetric(vertical: 15, horizontal: 22),
         ),
         shape: const WidgetStatePropertyAll(StadiumBorder()),
         elevation: const WidgetStatePropertyAll(0),
@@ -95,7 +95,7 @@ abstract class AppThemes {
           BorderSide(color: AppColors.border),
         ),
         padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(vertical: 15),
+          EdgeInsets.symmetric(vertical: 15, horizontal: 22),
         ),
         shape: const WidgetStatePropertyAll(StadiumBorder()),
       ),
@@ -107,6 +107,9 @@ abstract class AppThemes {
           GoogleFonts.manrope(fontWeight: FontWeight.w500, fontSize: 15),
         ),
         foregroundColor: const WidgetStatePropertyAll(AppColors.primary),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        ),
         shape: const WidgetStatePropertyAll(StadiumBorder()),
       ),
     ),

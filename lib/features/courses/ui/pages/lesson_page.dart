@@ -240,15 +240,18 @@ class _LessonPageState extends State<LessonPage> {
 
                         const SizedBox(height: 16),
 
-                        // Take Quiz button
+                        // Record retelling button
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             onPressed: () => context.router.push(
-                              QuizRoute(lessonId: lesson.id),
+                              RecordingRoute(
+                                lessonId: lesson.id,
+                                lessonTitle: lesson.name,
+                              ),
                             ),
-                            icon: const Icon(Icons.quiz_rounded),
-                            label: const Text('Take Quiz'),
+                            icon: const Icon(Icons.mic_rounded),
+                            label: const Text('Record Retelling'),
                           ),
                         ),
 
