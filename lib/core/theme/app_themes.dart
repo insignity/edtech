@@ -26,74 +26,88 @@ abstract class AppThemes {
       shadowColor: AppColors.border,
       centerTitle: true,
       iconTheme: const IconThemeData(color: AppColors.darkText),
-      titleTextStyle: GoogleFonts.poppins(
-        fontWeight: FontWeight.w600,
-        fontSize: 18,
+      titleTextStyle: GoogleFonts.manrope(
+        fontWeight: FontWeight.w700,
+        fontSize: 17,
         color: AppColors.darkText,
       ),
     ),
 
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: AppColors.white,
       selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.gray,
-      selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-      unselectedLabelStyle: TextStyle(fontSize: 12),
+      unselectedItemColor: AppColors.grayMuted,
+      selectedLabelStyle: GoogleFonts.manrope(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+      ),
+      unselectedLabelStyle: GoogleFonts.manrope(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+      ),
       elevation: 8,
       type: BottomNavigationBarType.fixed,
     ),
 
+    // Filled surface, no border — matches the design's card language.
     cardTheme: CardThemeData(
       elevation: 0,
-      color: AppColors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
-      ),
+      color: AppColors.grayLight,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: EdgeInsets.zero,
     ),
 
+    // Pill CTA: indigo fill, white label, weight 500.
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         textStyle: WidgetStatePropertyAll(
-          GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-            letterSpacing: 0.5,
-          ),
+          GoogleFonts.manrope(fontWeight: FontWeight.w500, fontSize: 15),
         ),
-        foregroundColor: const WidgetStatePropertyAll(AppColors.white),
         padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(vertical: 14),
+          EdgeInsets.symmetric(vertical: 15),
         ),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+        shape: const WidgetStatePropertyAll(StadiumBorder()),
         elevation: const WidgetStatePropertyAll(0),
         backgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.disabled)) {
-            return AppColors.gray.withOpacity(0.4);
-          }
+          if (states.contains(WidgetState.disabled)) return AppColors.grayLight;
+          if (states.contains(WidgetState.pressed)) return AppColors.primaryDark;
           return AppColors.primary;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) return AppColors.grayMuted;
+          return AppColors.white;
         }),
       ),
     ),
 
+    // Secondary pill: white fill, neutral border and label.
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
         textStyle: WidgetStatePropertyAll(
-          GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 15),
+          GoogleFonts.manrope(fontWeight: FontWeight.w500, fontSize: 15),
         ),
-        foregroundColor: const WidgetStatePropertyAll(AppColors.primary),
+        backgroundColor: const WidgetStatePropertyAll(AppColors.white),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) return AppColors.grayMuted;
+          return AppColors.textSecondary;
+        }),
         side: const WidgetStatePropertyAll(
-          BorderSide(color: AppColors.primary, width: 1.5),
+          BorderSide(color: AppColors.border),
         ),
         padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(vertical: 14),
+          EdgeInsets.symmetric(vertical: 15),
         ),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: const WidgetStatePropertyAll(StadiumBorder()),
+      ),
+    ),
+
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+          GoogleFonts.manrope(fontWeight: FontWeight.w500, fontSize: 15),
         ),
+        foregroundColor: const WidgetStatePropertyAll(AppColors.primary),
+        shape: const WidgetStatePropertyAll(StadiumBorder()),
       ),
     ),
 

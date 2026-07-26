@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls -la ~/.claude/projects/ 2>/dev/null | head -30; echo \"---MEMORY---\"; ls -la ~/.claude/projects/-Users-aero-IdeaProjects-edtech/memory/ 2>/dev/null)"
+      "Bash(ls -la ~/.claude/projects/ 2>/dev/null | head -30; echo \"---MEMORY---\"; ls -la ~/.claude/projects/-Users-aero-IdeaProjects-edtech/memory/ 2>/dev/null)",
+      "Bash(python3 - /Users/aero/.claude/projects/-Users-aero-IdeaProjects-edtech/3f0094eb-586e-49c6-aca3-208599e32fe3/tool-results/toolu_01SXnA4qoepWroZGTiwnaNwu.txt)",
+      "WebFetch(domain:claude.ai)",
+      "mcp__claude-in-chrome__list_connected_browsers",
+      "Bash(flutter analyze *)",
+      "Bash(flutter test *)"
     ]
   }
 }

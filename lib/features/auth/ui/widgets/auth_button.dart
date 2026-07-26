@@ -14,17 +14,11 @@ class AuthButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (_, state) {
-        if (state is AuthLoading) {
-          return ElevatedButton(
-            onPressed: null,
-            child: CupertinoActivityIndicator(),
-          );
-        } else if (state is AuthError) {
-          return ElevatedButton(onPressed: onPressed, child: Text(text));
-        } else if (state is AuthInitial) {
-          return ElevatedButton(onPressed: onPressed, child: Text(text));
-        }
-        return SizedBox.shrink();
+        final isLoading = state is AuthLoading;
+        return ElevatedButton(
+          onPressed: isLoading ? null : onPressed,
+          child: isLoading ? const CupertinoActivityIndicator() : Text(text),
+        );
       },
     );
   }

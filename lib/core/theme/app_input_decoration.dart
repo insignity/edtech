@@ -1,20 +1,25 @@
 part of 'app_themes.dart';
 
 class AppInputDecorationTheme {
-  static final borderRadius = BorderRadius.circular(12);
+  static final borderRadius = BorderRadius.circular(16);
 
   static final mobile = InputDecorationTheme(
     filled: true,
     fillColor: AppColors.grayLight,
-    labelStyle: TextStyle(color: AppColors.gray, fontSize: 14),
-    floatingLabelStyle: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w500),
+    labelStyle: GoogleFonts.manrope(color: AppColors.gray, fontSize: 14),
+    hintStyle: GoogleFonts.manrope(color: AppColors.grayMuted, fontSize: 15),
+    floatingLabelStyle: GoogleFonts.manrope(
+      color: AppColors.primary,
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+    ),
     enabledBorder: OutlineInputBorder(
       borderRadius: borderRadius,
-      borderSide: const BorderSide(color: AppColors.border),
+      borderSide: BorderSide.none,
     ),
     disabledBorder: OutlineInputBorder(
       borderRadius: borderRadius,
-      borderSide: const BorderSide(color: AppColors.border),
+      borderSide: BorderSide.none,
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: borderRadius,
