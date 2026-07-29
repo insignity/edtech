@@ -1,9 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../services/crash/crash_reporter.dart';
 import 'my_logger.dart';
 
 class AppBlocObserver extends BlocObserver {
+  final CrashReporter crashReporter;
+
+  const AppBlocObserver([this.crashReporter = const NoopCrashReporter()]);
+
   @override
   void onCreate(BlocBase bloc) {
     super.onCreate(bloc);
@@ -37,6 +42,12 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     debugPrint('ERROR -> ${bloc.runtimeType} $error');
+    // Non-fatal: the bloc caught it, but it still points at a real defect.
+    crashReporter.recordError(
+      error,
+      stackTrace,
+      reason: 'Unhandled error in ${bloc.runtimeType}',
+    );
     super.onError(bloc, error, stackTrace);
   }
 

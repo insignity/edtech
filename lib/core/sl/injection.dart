@@ -1,6 +1,7 @@
 import 'package:edtech/core/api/api_client.dart';
 import 'package:edtech/core/constants/constants.dart';
 import 'package:edtech/core/router/guards/auth_guard.dart';
+import 'package:edtech/core/services/crash/crash_reporter.dart';
 import 'package:edtech/core/services/session/session_events.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 import 'package:edtech/features/auth/data/auth_api.dart';
@@ -27,8 +28,9 @@ import '../../features/profile/ui/bloc/profile_bloc.dart';
 
 final sl = GetIt.instance;
 
-void injectServiceLocator() {
+void injectServiceLocator(CrashReporter crashReporter) {
   // external
+  sl.registerSingleton<CrashReporter>(crashReporter);
   sl.registerLazySingleton<FlutterSecureStorage>(
     () => const FlutterSecureStorage(),
   );

@@ -11,7 +11,11 @@
       "Bash(flutter pub *)",
       "Bash(git check-ignore *)",
       "WebSearch",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(cd ~/.pub-cache/hosted/pub.dev; ls -d firebase_core-* firebase_crashlytics-* 2>/dev/null | tail -4 *)",
+      "Bash(pod install *)",
+      "Bash(firebase login:list)",
+      "Bash(flutterfire --version)"
     ]
   }
 }

@@ -13,10 +13,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class LessonPage extends StatefulWidget {
   final String lessonId;
 
-  const LessonPage({
-    super.key,
-    @PathParam('lessonId') required this.lessonId,
-  });
+  const LessonPage({super.key, @PathParam('lessonId') required this.lessonId});
 
   @override
   State<LessonPage> createState() => _LessonPageState();
@@ -70,7 +67,8 @@ class _LessonPageState extends State<LessonPage> {
       if (remaining.inSeconds <= 10) {
         _autoCompleted = true;
         final blocState = _bloc.state;
-        if (blocState is LessonLoaded && !blocState.navigation.current.isCompleted) {
+        if (blocState is LessonLoaded &&
+            !blocState.navigation.current.isCompleted) {
           _bloc.add(LessonComplete(blocState.navigation.current.id));
         }
       }
@@ -120,9 +118,17 @@ class _LessonPageState extends State<LessonPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 48,
+                      color: AppColors.error,
+                    ),
                     const SizedBox(height: 16),
-                    Text(state.error, textAlign: TextAlign.center, style: context.text.bodyMedium),
+                    Text(
+                      state.error,
+                      textAlign: TextAlign.center,
+                      style: context.text.bodyMedium,
+                    ),
                   ],
                 ),
               ),
@@ -141,17 +147,16 @@ class _LessonPageState extends State<LessonPage> {
               children: [
                 // Player
                 if (_ytController != null)
-                  YoutubePlayer(
-                    controller: _ytController!,
-                    aspectRatio: 16 / 9,
-                  )
+                  YoutubePlayer(controller: _ytController!, aspectRatio: 16 / 9)
                 else
                   AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Container(
                       color: Colors.black,
                       child: const Center(
-                        child: CircularProgressIndicator(color: AppColors.primary),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -189,7 +194,10 @@ class _LessonPageState extends State<LessonPage> {
                           const SizedBox(height: 20),
                           Text('Description', style: context.text.titleMedium),
                           const SizedBox(height: 8),
-                          Text(lesson.description!, style: context.text.bodyLarge),
+                          Text(
+                            lesson.description!,
+                            style: context.text.bodyLarge,
+                          ),
                         ],
 
                         const SizedBox(height: 24),
@@ -199,7 +207,9 @@ class _LessonPageState extends State<LessonPage> {
                           width: double.infinity,
                           child: lesson.isCompleted
                               ? Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.successLight,
                                     borderRadius: BorderRadius.circular(12),
@@ -207,8 +217,11 @@ class _LessonPageState extends State<LessonPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.check_circle_rounded,
-                                          color: AppColors.success, size: 20),
+                                      const Icon(
+                                        Icons.check_circle_rounded,
+                                        color: AppColors.success,
+                                        size: 20,
+                                      ),
                                       const SizedBox(width: 8),
                                       Text(
                                         'Completed',
@@ -221,7 +234,9 @@ class _LessonPageState extends State<LessonPage> {
                               : ElevatedButton.icon(
                                   onPressed: loaded.isCompleting
                                       ? null
-                                      : () => _bloc.add(LessonComplete(lesson.id)),
+                                      : () => _bloc.add(
+                                          LessonComplete(lesson.id),
+                                        ),
                                   icon: loaded.isCompleting
                                       ? const SizedBox(
                                           width: 18,
@@ -232,12 +247,15 @@ class _LessonPageState extends State<LessonPage> {
                                           ),
                                         )
                                       : const Icon(Icons.check_rounded),
-                                  label: Text(loaded.isCompleting
-                                      ? 'Saving...'
-                                      : 'Mark as Complete'),
+                                  label: Text(
+                                    loaded.isCompleting
+                                        ? 'Saving...'
+                                        : 'Mark as Complete',
+                                  ),
                                 ),
                         ),
 
+                        // TODO Uncomment when necessary
                         const SizedBox(height: 16),
 
                         // Record retelling button
@@ -254,7 +272,6 @@ class _LessonPageState extends State<LessonPage> {
                             label: const Text('Record Retelling'),
                           ),
                         ),
-
                         const SizedBox(height: 32),
                       ],
                     ),
@@ -279,7 +296,8 @@ class _LessonPageState extends State<LessonPage> {
                       if (nav.previous != null)
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _bloc.add(LessonLoad(nav.previous!.id)),
+                            onPressed: () =>
+                                _bloc.add(LessonLoad(nav.previous!.id)),
                             icon: const Icon(Icons.arrow_back_rounded),
                             label: const Text('Previous'),
                           ),
@@ -289,7 +307,8 @@ class _LessonPageState extends State<LessonPage> {
                       if (nav.next != null)
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () => _bloc.add(LessonLoad(nav.next!.id)),
+                            onPressed: () =>
+                                _bloc.add(LessonLoad(nav.next!.id)),
                             icon: const Icon(Icons.arrow_forward_rounded),
                             label: const Text('Next'),
                             iconAlignment: IconAlignment.end,

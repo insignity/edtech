@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/router/app_router.dart';
+import 'core/services/crash/crash_reporting.dart';
 import 'core/services/session/session_events.dart';
 import 'core/sl/injection.dart';
 import 'core/utils/app_bloc_observer.dart';
@@ -17,10 +18,14 @@ import 'features/courses/ui/bloc/lesson/lesson_bloc.dart';
 import 'features/my_courses/ui/bloc/my_courses_bloc.dart';
 import 'features/profile/ui/bloc/profile_bloc.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = AppBlocObserver();
-  injectServiceLocator();
+
+  // Start reporting before anything else, so failures during setup are caught.
+  final crashReporter = await initCrashReporting();
+
+  Bloc.observer = AppBlocObserver(crashReporter);
+  injectServiceLocator(crashReporter);
 
   logger.i("data");
   logger.d("data");
