@@ -1,1 +1,0 @@
-Supports mail: ayarsen1995@gmail.com
