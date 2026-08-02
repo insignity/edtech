@@ -96,9 +96,13 @@ final class RecordingFailed extends RecordingState {
   final Duration duration;
   final List<double> levels;
 
+  /// What the backend said went wrong, when it said anything.
+  final String? message;
+
   RecordingFailed({
     required this.path,
     required this.duration,
     required this.levels,
+    this.message,
   });
 }

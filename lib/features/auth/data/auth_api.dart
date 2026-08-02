@@ -15,6 +15,7 @@ class AuthApi {
       final response = await api.post(
         '/token/',
         data: {'email': email, 'password': password},
+        putToken: false,
       );
       return TokenModel.fromJson(response.data as Json);
     } catch (e) {
@@ -64,6 +65,7 @@ class AuthApi {
         'last_name': lastName,
         'phone': phone,
       },
+      putToken: false,
     );
     return RegisterModel.fromJson(response.data as Json);
   }

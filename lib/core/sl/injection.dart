@@ -11,10 +11,11 @@ import 'package:edtech/features/courses/data/services/lessons_store_service.dart
 import 'package:edtech/features/courses/ui/bloc/course_details/course_details_bloc.dart';
 import 'package:edtech/features/profile/data/profile_api.dart';
 import 'package:edtech/features/profile/data/profile_repository.dart';
-import 'package:edtech/features/recording/data/fake_recording_repository.dart';
 import 'package:edtech/features/recording/data/recording_repository.dart';
 import 'package:edtech/features/recording/data/services/audio_player_service.dart';
 import 'package:edtech/features/recording/data/services/audio_recorder_service.dart';
+import 'package:edtech/features/recording/data/services/audio_uploader.dart';
+import 'package:edtech/features/recording/data/speaking_api.dart';
 import 'package:edtech/features/recording/ui/bloc/recording_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -48,6 +49,10 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerFactory<AudioRecorderService>(() => AudioRecorderServiceImpl());
   sl.registerFactory<AudioPlayerService>(() => AudioPlayerServiceImpl());
 
+  // Uploads go straight to S3 on their own Dio — the app client would attach
+  // the JWT and log the presigned URL.
+  sl.registerLazySingleton<AudioUploader>(() => AudioUploaderImpl());
+
   //api
   sl.registerLazySingleton<ApiClient>(
     () => ApiClient(Constants.url, tokenService: sl(), sessionEvents: sl()),
@@ -63,10 +68,8 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerLazySingleton<CoursesRepository>(
     () => CoursesRepositoryImpl(sl(), sl()),
   );
-  // Simulated analysis — swap for RecordingRepositoryImpl once the API has an
-  // endpoint for uploading a recording.
   sl.registerLazySingleton<RecordingRepository>(
-    () => const FakeRecordingRepository(),
+    () => RecordingRepositoryImpl(sl(), sl()),
   );
   //bloc
   sl.registerFactory<AuthBloc>(() => AuthBloc(sl()));
@@ -83,4 +86,5 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerLazySingleton<AuthApi>(() => AuthApi(sl()));
   sl.registerLazySingleton<ProfileApi>(() => ProfileApi(sl()));
   sl.registerLazySingleton<CoursesApi>(() => CoursesApi(sl()));
+  sl.registerLazySingleton<SpeakingApi>(() => SpeakingApi(sl()));
 }

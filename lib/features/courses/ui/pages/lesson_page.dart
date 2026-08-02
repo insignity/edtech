@@ -147,16 +147,13 @@ class _LessonPageState extends State<LessonPage> {
               children: [
                 // Player
                 if (_ytController != null)
-                  YoutubePlayer(controller: _ytController!, aspectRatio: 16 / 9)
+                  YoutubePlayer(controller: _ytController!)
                 else
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Container(
-                      color: Colors.black,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primary,
-                        ),
+                  Container(
+                    color: Colors.black,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
                       ),
                     ),
                   ),

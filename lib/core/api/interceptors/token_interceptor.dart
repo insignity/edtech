@@ -28,7 +28,11 @@ class TokenInterceptor implements Interceptor {
   ) async {
     if (options.extra['putToken'] == true) {
       final token = await tokenService.getAccess();
-      options.headers['Authorization'] = 'Bearer $token';
+      // With no token stored, send no header at all: 'Bearer null' is parsed
+      // as an invalid token and answered with 401 even on public endpoints.
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }
@@ -44,6 +48,15 @@ class TokenInterceptor implements Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode != 401) {
+      handler.next(err);
+      return;
+    }
+
+    // A 401 on a request that carried no token — login, register — is a verdict
+    // on the credentials, not on an expired session. Don't refresh, and don't
+    // kick the user to the login screen they are already standing on.
+    if (err.requestOptions.extra['putToken'] != true ||
+        err.requestOptions.headers['Authorization'] == null) {
       handler.next(err);
       return;
     }

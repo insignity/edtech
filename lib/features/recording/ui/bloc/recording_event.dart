@@ -39,4 +39,9 @@ class RecordingResultReceived extends RecordingEvent {
 
 class RecordingAnalysisFinished extends RecordingEvent {}
 
-class RecordingAnalysisFailed extends RecordingEvent {}
+class RecordingAnalysisFailed extends RecordingEvent {
+  /// Safe, user-facing text from the backend, when it gave one.
+  final String? message;
+
+  RecordingAnalysisFailed([this.message]);
+}

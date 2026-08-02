@@ -111,11 +111,7 @@ class RecordingBloc extends Bloc<RecordingEvent, RecordingState> {
     _listenToPlayback();
 
     emit(
-      RecordingReview(
-        path: path,
-        duration: duration,
-        levels: current.levels,
-      ),
+      RecordingReview(path: path, duration: duration, levels: current.levels),
     );
   }
 
@@ -194,9 +190,7 @@ class RecordingBloc extends Bloc<RecordingEvent, RecordingState> {
     if (path == null) return;
 
     await _stopPlayback();
-    emit(
-      RecordingAnalyzing(path: path, duration: duration, levels: levels),
-    );
+    emit(RecordingAnalyzing(path: path, duration: duration, levels: levels));
 
     await _analysisSubscription?.cancel();
     _analysisSubscription = repository
@@ -208,7 +202,11 @@ class RecordingBloc extends Bloc<RecordingEvent, RecordingState> {
               result,
             ),
           }),
-          onError: (_) => add(RecordingAnalysisFailed()),
+          onError: (Object error) => add(
+            RecordingAnalysisFailed(
+              error is AnalysisException ? error.message : null,
+            ),
+          ),
           onDone: () => add(RecordingAnalysisFinished()),
         );
   }
@@ -264,6 +262,7 @@ class RecordingBloc extends Bloc<RecordingEvent, RecordingState> {
         path: current.path,
         duration: current.duration,
         levels: current.levels,
+        message: event.message,
       ),
     );
   }

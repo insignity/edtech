@@ -57,10 +57,16 @@ class RecordingPage extends StatelessWidget implements AutoRouteWrapper {
                   ),
                   RecordingPermissionDenied() => const _PermissionDenied(),
                   RecordingInProgress() => _Capture(state: state),
-                  RecordingReview() => _Review(state: state, lessonId: lessonId),
+                  RecordingReview() => _Review(
+                    state: state,
+                    lessonId: lessonId,
+                  ),
                   RecordingAnalyzing() => _Analyzing(state: state),
                   RecordingAnalyzed() => const SizedBox.shrink(),
-                  RecordingFailed() => _Failed(state: state, lessonId: lessonId),
+                  RecordingFailed() => _Failed(
+                    state: state,
+                    lessonId: lessonId,
+                  ),
                 },
               ),
             ),
@@ -367,7 +373,10 @@ class _Failed extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 260),
             child: Text(
-              'Your recording was saved — you can retry anytime.',
+              // The backend hands back a message meant for the learner; fall
+              // back to reassurance when the failure was on our side.
+              state.message ??
+                  'Your recording was saved — you can retry anytime.',
               textAlign: TextAlign.center,
               style: context.text.bodyMedium,
             ),
