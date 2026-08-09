@@ -1,5 +1,6 @@
 import 'package:edtech/core/utils/error_handler.dart';
 import 'package:edtech/features/auth/data/auth_api.dart';
+import 'package:edtech/features/recording/data/services/speaking_attempt_store.dart';
 
 import '../../../core/services/token/token_service.dart';
 import '../../../core/utils/my_logger.dart';
@@ -32,8 +33,9 @@ abstract class AuthRepository {
 class AuthRepositoryImpl implements AuthRepository {
   final AuthApi api;
   final TokenService tokenService;
+  final SpeakingAttemptStore attemptStore;
 
-  AuthRepositoryImpl(this.api, this.tokenService);
+  AuthRepositoryImpl(this.api, this.tokenService, this.attemptStore);
 
   @override
   Future<TokenModel> login({
@@ -82,6 +84,8 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<dynamic> logout() async {
     logger.i("$this .logout() ");
     await tokenService.deleteAll();
+    // Cached attempts carry the previous learner's transcripts.
+    attemptStore.clear();
   }
 
   @override

@@ -1,6 +1,11 @@
+import 'dart:ui';
+
+import 'package:auto_route/auto_route.dart';
+import 'package:edtech/core/router/app_router.dart';
 import 'package:edtech/core/theme/app_themes.dart';
 import 'package:edtech/features/recording/models/retelling_result.dart';
 import 'package:edtech/features/recording/models/speaking_attempt.dart';
+import 'package:edtech/features/recording/ui/widgets/score_band_colors.dart';
 import 'package:edtech/features/speaking_history/models/speaking_history.dart';
 import 'package:edtech/shared/extensions/extensions.dart';
 import 'package:flutter/material.dart';
@@ -108,8 +113,13 @@ class _HistoryLessonCardState extends State<HistoryLessonCard> {
             secondChild: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final attempt in widget.lesson.attempts)
-                  _AttemptRow(attempt: attempt),
+                for (var index = 0; index < lesson.attempts.length; index++)
+                  _AttemptRow(
+                    attempt: lesson.attempts[index],
+                    lessonId: lesson.id,
+                    lessonTitle: lesson.title,
+                    delta: _deltaAt(lesson.attempts, index),
+                  ),
               ],
             ),
           ),
@@ -119,70 +129,112 @@ class _HistoryLessonCardState extends State<HistoryLessonCard> {
   }
 }
 
+/// Score change between the attempt at [index] and the graded one before it.
+///
+/// The list runs newest first, so "before" means further down it. Null when
+/// either side has no score — there is then nothing honest to show.
+int? _deltaAt(List<SpeakingAttemptSummary> attempts, int index) {
+  final current = attempts[index].overallScore;
+  if (current == null) return null;
+
+  for (var next = index + 1; next < attempts.length; next++) {
+    final previous = attempts[next].overallScore;
+    if (previous != null) return current - previous;
+  }
+  return null;
+}
+
 class _AttemptRow extends StatelessWidget {
   final SpeakingAttemptSummary attempt;
+  final String lessonId;
+  final String lessonTitle;
+  final int? delta;
 
-  const _AttemptRow({required this.attempt});
+  const _AttemptRow({
+    required this.attempt,
+    required this.lessonId,
+    required this.lessonTitle,
+    required this.delta,
+  });
 
   @override
   Widget build(BuildContext context) {
     final graded = attempt.overallScore != null;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.border)),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 34,
-            child: Text(
-              '#${attempt.attemptNumber}',
-              style: context.text.labelMedium! + AppColors.gray,
+    return InkWell(
+      // Only a graded attempt has a breakdown to open.
+      onTap: graded
+          ? () => context.router.push(
+              AttemptDetailsRoute(
+                attemptId: attempt.id,
+                lessonId: lessonId,
+                lessonTitle: lessonTitle,
+                attemptNumber: attempt.attemptNumber,
+                delta: delta,
+              ),
+            )
+          : null,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: AppColors.border)),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 34,
+              child: Text(
+                '#${attempt.attemptNumber}',
+                style: context.text.labelMedium! + AppColors.gray,
+              ),
             ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (graded)
-                  Text(
-                    [
-                      formatAttemptDuration(attempt.durationSeconds),
-                      if (attempt.wordsPerMinute != null)
-                        '${attempt.wordsPerMinute!.round()} wpm',
-                    ].join(' · '),
-                    style: context.text.bodyMedium,
-                  )
-                else
-                  Text(
-                    _statusLabel(attempt.status),
-                    style: context.text.bodyMedium! + AppColors.gray,
-                  ),
-                if (attempt.createdAt != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    formatHistoryDateTime(attempt.createdAt!),
-                    style: context.text.labelMedium! + AppColors.grayMuted,
-                  ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (graded)
+                    Text(
+                      [
+                        formatAttemptDuration(attempt.durationSeconds),
+                        if (attempt.wordsPerMinute != null)
+                          '${attempt.wordsPerMinute!.round()} wpm',
+                      ].join(' · '),
+                      style: context.text.bodyMedium,
+                    )
+                  else
+                    Text(
+                      _statusLabel(attempt.status),
+                      style: context.text.bodyMedium! + AppColors.gray,
+                    ),
+                  if (attempt.createdAt != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      formatHistoryDateTime(attempt.createdAt!),
+                      style: context.text.labelMedium! + AppColors.grayMuted,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          if (graded)
-            Text(
-              '${attempt.overallScore}',
-              style:
-                  context.text.titleLarge!
-                      .weight(FontWeight.w700)
-                      .copyWith(
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ) +
-                  bandColor(ScoreBand.of(attempt.overallScore!)),
-            ),
-        ],
+            const SizedBox(width: 12),
+            if (graded) ...[
+              Text(
+                '${attempt.overallScore}',
+                style:
+                    context.text.titleLarge!
+                        .weight(FontWeight.w700)
+                        .copyWith(
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ) +
+                    bandColor(ScoreBand.of(attempt.overallScore!)),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.grayMuted,
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -250,18 +302,6 @@ class _Chip extends StatelessWidget {
     );
   }
 }
-
-Color bandColor(ScoreBand band) => switch (band) {
-  ScoreBand.strong => AppColors.success,
-  ScoreBand.fair => AppColors.warning,
-  ScoreBand.weak => AppColors.error,
-};
-
-Color bandBackground(ScoreBand band) => switch (band) {
-  ScoreBand.strong => AppColors.successLight,
-  ScoreBand.fair => AppColors.warningLight,
-  ScoreBand.weak => AppColors.errorLight,
-};
 
 String _statusLabel(SpeakingAttemptStatus status) => switch (status) {
   SpeakingAttemptStatus.failed => 'Processing failed',

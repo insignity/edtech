@@ -15,9 +15,11 @@ import 'package:edtech/features/recording/data/recording_repository.dart';
 import 'package:edtech/features/recording/data/services/audio_player_service.dart';
 import 'package:edtech/features/recording/data/services/audio_recorder_service.dart';
 import 'package:edtech/features/recording/data/services/audio_uploader.dart';
+import 'package:edtech/features/recording/data/services/speaking_attempt_store.dart';
 import 'package:edtech/features/recording/data/speaking_api.dart';
 import 'package:edtech/features/recording/ui/bloc/recording_bloc.dart';
 import 'package:edtech/features/speaking_history/data/speaking_history_repository.dart';
+import 'package:edtech/features/speaking_history/ui/bloc/attempt_details_bloc.dart';
 import 'package:edtech/features/speaking_history/ui/bloc/speaking_history_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -45,6 +47,10 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerLazySingleton<SessionEvents>(() => SessionEvents());
   sl.registerLazySingleton<LessonsStoreService>(() => LessonsStoreService());
 
+  // Graded attempts never change, so reopening one from history is served from
+  // memory. Cleared on logout — it holds the learner's own transcripts.
+  sl.registerLazySingleton<SpeakingAttemptStore>(() => SpeakingAttemptStore());
+
   // Recording owns native handles, so each screen gets its own instance and
   // disposes it when the bloc closes.
   sl.registerFactory<AudioRecorderService>(() => AudioRecorderServiceImpl());
@@ -61,7 +67,7 @@ void injectServiceLocator(CrashReporter crashReporter) {
 
   //repositories
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(sl(), sl()),
+    () => AuthRepositoryImpl(sl(), sl(), sl()),
   );
   sl.registerLazySingleton<ProfileRepository>(
     () => ProfileRepositoryImpl(sl()),
@@ -73,7 +79,7 @@ void injectServiceLocator(CrashReporter crashReporter) {
     () => RecordingRepositoryImpl(sl(), sl()),
   );
   sl.registerLazySingleton<SpeakingHistoryRepository>(
-    () => SpeakingHistoryRepositoryImpl(sl()),
+    () => SpeakingHistoryRepositoryImpl(sl(), sl()),
   );
   //bloc
   sl.registerFactory<AuthBloc>(() => AuthBloc(sl()));
@@ -85,6 +91,7 @@ void injectServiceLocator(CrashReporter crashReporter) {
     () => RecordingBloc(recorder: sl(), player: sl(), repository: sl()),
   );
   sl.registerFactory<SpeakingHistoryBloc>(() => SpeakingHistoryBloc(sl()));
+  sl.registerFactory<AttemptDetailsBloc>(() => AttemptDetailsBloc(sl()));
 
   //api
   sl.registerLazySingleton<AuthApi>(() => AuthApi(sl()));

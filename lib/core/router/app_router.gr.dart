@@ -11,6 +11,99 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AttemptDetailsPage]
+class AttemptDetailsRoute extends PageRouteInfo<AttemptDetailsRouteArgs> {
+  AttemptDetailsRoute({
+    Key? key,
+    required String attemptId,
+    required String lessonId,
+    required String lessonTitle,
+    required int attemptNumber,
+    int? delta,
+    List<PageRouteInfo>? children,
+  }) : super(
+         AttemptDetailsRoute.name,
+         args: AttemptDetailsRouteArgs(
+           key: key,
+           attemptId: attemptId,
+           lessonId: lessonId,
+           lessonTitle: lessonTitle,
+           attemptNumber: attemptNumber,
+           delta: delta,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'AttemptDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<AttemptDetailsRouteArgs>();
+      return WrappedRoute(
+        child: AttemptDetailsPage(
+          key: args.key,
+          attemptId: args.attemptId,
+          lessonId: args.lessonId,
+          lessonTitle: args.lessonTitle,
+          attemptNumber: args.attemptNumber,
+          delta: args.delta,
+        ),
+      );
+    },
+  );
+}
+
+class AttemptDetailsRouteArgs {
+  const AttemptDetailsRouteArgs({
+    this.key,
+    required this.attemptId,
+    required this.lessonId,
+    required this.lessonTitle,
+    required this.attemptNumber,
+    this.delta,
+  });
+
+  final Key? key;
+
+  final String attemptId;
+
+  final String lessonId;
+
+  final String lessonTitle;
+
+  final int attemptNumber;
+
+  final int? delta;
+
+  @override
+  String toString() {
+    return 'AttemptDetailsRouteArgs{key: $key, attemptId: $attemptId, lessonId: $lessonId, lessonTitle: $lessonTitle, attemptNumber: $attemptNumber, delta: $delta}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! AttemptDetailsRouteArgs) return false;
+    return key == other.key &&
+        attemptId == other.attemptId &&
+        lessonId == other.lessonId &&
+        lessonTitle == other.lessonTitle &&
+        attemptNumber == other.attemptNumber &&
+        delta == other.delta;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      attemptId.hashCode ^
+      lessonId.hashCode ^
+      lessonTitle.hashCode ^
+      attemptNumber.hashCode ^
+      delta.hashCode;
+}
+
+/// generated route for
 /// [CourseDetailsPage]
 class CourseDetailsRoute extends PageRouteInfo<CourseDetailsRouteArgs> {
   CourseDetailsRoute({

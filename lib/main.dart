@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/router/app_router.dart';
 import 'core/services/crash/crash_reporting.dart';
 import 'core/services/session/session_events.dart';
+import 'features/recording/data/services/speaking_attempt_store.dart';
 import 'core/sl/injection.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'core/utils/my_logger.dart';
@@ -65,6 +66,9 @@ class _MyAppState extends State<MyApp> {
     // user is already inside the app has to be handled from here — otherwise
     // they sit on a screen where every request 401s.
     _sessionSubscription = sl<SessionEvents>().onExpired.listen((_) {
+      // Expiry never goes through AuthRepository.logout, so the cached
+      // transcripts have to be dropped from here too.
+      sl<SpeakingAttemptStore>().clear();
       _appRouter.replaceAll([const LoginRoute()]);
     });
   }
