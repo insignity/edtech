@@ -36,7 +36,13 @@
       "PowerShell(flutter test 2>&1)",
       "PowerShell(\"removed\")",
       "PowerShell(flutter analyze lib/ test/)",
-      "PowerShell(flutter build apk --debug 2>&1)"
+      "PowerShell(flutter build apk --debug 2>&1)",
+      "PowerShell($paths = @\\(\"$env:ProgramFiles\\\\Android\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\",\"${env:ProgramFiles\\(x86\\)}\\\\Android\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\",\"$env:LOCALAPPDATA\\\\Programs\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\",\"$env:JAVA_HOME\\\\bin\\\\keytool.exe\"\\); foreach \\($p in $paths\\) { if \\($p -and \\(Test-Path $p\\)\\) { \"FOUND: $p\" } }; \"--- JAVA_HOME: $env:JAVA_HOME ---\"; flutter doctor -v 2>&1 | Select-String -Pattern \"Java binary|Java version\")",
+      "PowerShell(flutter build appbundle --release 2>&1)",
+      "PowerShell(& \"A:\\\\Programs\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\" -printcert -jarfile \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\build\\\\app\\\\outputs\\\\bundle\\\\release\\\\app-release.aab\" 2>$null | Select-String -Pattern \"Owner|Valid from\" | Select-Object -First 2; \"--- largest assets ---\"; Get-ChildItem \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\assets\" -Recurse -File | Sort-Object Length -Descending | Select-Object Name,@{n='MB';e={[math]::Round\\($_.Length/1MB,1\\)}} -First 5)",
+      "PowerShell($candidates = @\\(\"$env:USERPROFILE\\\\upload-keystore.jks\",\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\android\\\\upload-keystore.jks\",\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\upload-keystore.jks\"\\); foreach \\($c in $candidates\\) { if \\(Test-Path $c\\) { $i = Get-Item $c; \"EXISTS: $\\($i.FullName\\)  $\\($i.Length\\) bytes  created $\\($i.CreationTime\\)\" } }; \"--- key.properties ---\"; if \\(Test-Path \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\android\\\\key.properties\"\\) { \"key.properties EXISTS\" } else { \"key.properties not created yet\" })",
+      "PowerShell(\"--- tags ---\")",
+      "PowerShell(\"--- uncommitted ---\")"
     ]
   }
 }
