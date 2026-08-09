@@ -21,7 +21,12 @@
       "PowerShell(flutter test test/features/recording/recording_repository_test.dart test/features/recording/speaking_attempt_test.dart --reporter compact 2>&1)",
       "PowerShell(dart format lib/features/recording lib/core/sl/injection.dart test/features/recording 2>&1)",
       "PowerShell(git checkout -- lib/features/recording/data/services/audio_player_service.dart lib/features/recording/ui/pages/results_page.dart test/features/recording/recording_bloc_test.dart)",
-      "PowerShell(flutter test --reporter compact 2>&1)"
+      "PowerShell(flutter test --reporter compact 2>&1)",
+      "PowerShell(Add-Type -AssemblyName System.Windows.Forms, System.Drawing; $img = [System.Windows.Forms.Clipboard]::GetImage\\(\\); if \\($null -eq $img\\) { \"NO_IMAGE_IN_CLIPBOARD\" } else { \"FOUND: $\\($img.Width\\)x$\\($img.Height\\)\" })",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $f = \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\assets\\\\icon.jpg\"; $i = Get-Item $f; $img = [System.Drawing.Image]::FromFile\\($f\\); \"Size: $\\($i.Length\\) bytes\"; \"Modified: $\\($i.LastWriteTime\\)\"; \"Dimensions: $\\($img.Width\\)x$\\($img.Height\\)\"; \"Format: $\\($img.RawFormat\\)\"; $img.Dispose\\(\\))",
+      "PowerShell(dart run icons_launcher:create)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; foreach \\($p in @\\(\"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-xxxhdpi\\\\ic_launcher.png\",\"ios\\\\Runner\\\\Assets.xcassets\\\\AppIcon.appiconset\\\\Icon-App-1024x1024@1x.png\"\\)\\) { $img = [System.Drawing.Image]::FromFile\\(\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\$p\"\\); \"$p -> $\\($img.Width\\)x$\\($img.Height\\)\"; $img.Dispose\\(\\) }; git log --oneline -3)",
+      "PowerShell(git show 3786e65:lib/features/auth/data/auth_api.dart | Out-File -Encoding utf8 \"$env:TEMP\\\\head_auth_api.txt\"; \\(Get-Content \"$env:TEMP\\\\head_auth_api.txt\" | Measure-Object -Line\\).Lines; \"--- diff working vs HEAD ---\"; git diff HEAD --stat; \"--- exit: $LASTEXITCODE\")"
     ]
   }
 }
