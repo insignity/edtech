@@ -1,7 +1,17 @@
 import 'package:edtech/features/recording/models/speaking_attempt.dart';
 
 /// How a score reads at a glance. The palette assigns one colour per band.
-enum ScoreBand { strong, fair, weak }
+enum ScoreBand {
+  strong,
+  fair,
+  weak;
+
+  static ScoreBand of(int score) => switch (score) {
+    >= 90 => ScoreBand.strong,
+    >= 70 => ScoreBand.fair,
+    _ => ScoreBand.weak,
+  };
+}
 
 class Correction {
   final String wrong;
@@ -55,11 +65,7 @@ class RetellingResult {
   static const int paceFloor = 120;
   static const int paceCeiling = 150;
 
-  ScoreBand get band => switch (score) {
-    >= 90 => ScoreBand.strong,
-    >= 70 => ScoreBand.fair,
-    _ => ScoreBand.weak,
-  };
+  ScoreBand get band => ScoreBand.of(score);
 
   bool get improved => delta >= 0;
 

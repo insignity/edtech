@@ -424,3 +424,19 @@ class ResultsRouteArgs {
   int get hashCode =>
       key.hashCode ^ result.hashCode ^ lessonId.hashCode ^ lessonTitle.hashCode;
 }
+
+/// generated route for
+/// [SpeakingHistoryPage]
+class SpeakingHistoryRoute extends PageRouteInfo<void> {
+  const SpeakingHistoryRoute({List<PageRouteInfo>? children})
+    : super(SpeakingHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'SpeakingHistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return WrappedRoute(child: const SpeakingHistoryPage());
+    },
+  );
+}

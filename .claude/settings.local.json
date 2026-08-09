@@ -26,7 +26,14 @@
       "PowerShell(Add-Type -AssemblyName System.Drawing; $f = \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\assets\\\\icon.jpg\"; $i = Get-Item $f; $img = [System.Drawing.Image]::FromFile\\($f\\); \"Size: $\\($i.Length\\) bytes\"; \"Modified: $\\($i.LastWriteTime\\)\"; \"Dimensions: $\\($img.Width\\)x$\\($img.Height\\)\"; \"Format: $\\($img.RawFormat\\)\"; $img.Dispose\\(\\))",
       "PowerShell(dart run icons_launcher:create)",
       "PowerShell(Add-Type -AssemblyName System.Drawing; foreach \\($p in @\\(\"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-xxxhdpi\\\\ic_launcher.png\",\"ios\\\\Runner\\\\Assets.xcassets\\\\AppIcon.appiconset\\\\Icon-App-1024x1024@1x.png\"\\)\\) { $img = [System.Drawing.Image]::FromFile\\(\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\$p\"\\); \"$p -> $\\($img.Width\\)x$\\($img.Height\\)\"; $img.Dispose\\(\\) }; git log --oneline -3)",
-      "PowerShell(git show 3786e65:lib/features/auth/data/auth_api.dart | Out-File -Encoding utf8 \"$env:TEMP\\\\head_auth_api.txt\"; \\(Get-Content \"$env:TEMP\\\\head_auth_api.txt\" | Measure-Object -Line\\).Lines; \"--- diff working vs HEAD ---\"; git diff HEAD --stat; \"--- exit: $LASTEXITCODE\")"
+      "PowerShell(git show 3786e65:lib/features/auth/data/auth_api.dart | Out-File -Encoding utf8 \"$env:TEMP\\\\head_auth_api.txt\"; \\(Get-Content \"$env:TEMP\\\\head_auth_api.txt\" | Measure-Object -Line\\).Lines; \"--- diff working vs HEAD ---\"; git diff HEAD --stat; \"--- exit: $LASTEXITCODE\")",
+      "PowerShell(dart run build_runner build --delete-conflicting-outputs)",
+      "PowerShell(flutter analyze lib/)",
+      "PowerShell(flutter analyze lib/features/speaking_history lib/features/recording lib/features/profile lib/core)",
+      "PowerShell(flutter test test/features/speaking_history)",
+      "PowerShell(flutter test)",
+      "PowerShell(flutter test test/features/speaking_history test/features/recording)",
+      "PowerShell(flutter test 2>&1)"
     ]
   }
 }

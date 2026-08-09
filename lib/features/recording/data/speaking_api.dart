@@ -2,6 +2,7 @@ import 'package:edtech/core/api/api_client.dart';
 import 'package:edtech/core/utils/error_handler.dart';
 import 'package:edtech/core/utils/types.dart';
 import 'package:edtech/features/recording/models/speaking_attempt.dart';
+import 'package:edtech/features/speaking_history/models/speaking_history.dart';
 
 class SpeakingApi {
   final ApiClient api;
@@ -61,6 +62,21 @@ class SpeakingApi {
       return results
           .map((item) => SpeakingAttemptSummary.fromJson(item as Json))
           .toList();
+    });
+  }
+
+  /// Every attempt the signed-in learner has made, grouped by lesson and
+  /// ordered by the most recent attempt.
+  Future<SpeakingHistoryModel> getSpeakingHistory({
+    int page = 1,
+    int pageSize = 20,
+  }) {
+    return guard<SpeakingHistoryModel>(() async {
+      final response = await api.get(
+        '/me/speaking-history/',
+        params: {'page': page, 'page_size': pageSize},
+      );
+      return SpeakingHistoryModel.fromJson(response.data as Json);
     });
   }
 }

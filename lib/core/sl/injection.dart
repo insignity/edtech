@@ -17,6 +17,8 @@ import 'package:edtech/features/recording/data/services/audio_recorder_service.d
 import 'package:edtech/features/recording/data/services/audio_uploader.dart';
 import 'package:edtech/features/recording/data/speaking_api.dart';
 import 'package:edtech/features/recording/ui/bloc/recording_bloc.dart';
+import 'package:edtech/features/speaking_history/data/speaking_history_repository.dart';
+import 'package:edtech/features/speaking_history/ui/bloc/speaking_history_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
@@ -71,6 +73,9 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerLazySingleton<RecordingRepository>(
     () => RecordingRepositoryImpl(sl(), sl()),
   );
+  sl.registerLazySingleton<SpeakingHistoryRepository>(
+    () => SpeakingHistoryRepositoryImpl(sl()),
+  );
   //bloc
   sl.registerFactory<AuthBloc>(() => AuthBloc(sl()));
   sl.registerFactory<ProfileBloc>(() => ProfileBloc(sl()));
@@ -81,6 +86,7 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerFactory<RecordingBloc>(
     () => RecordingBloc(recorder: sl(), player: sl(), repository: sl()),
   );
+  sl.registerFactory<SpeakingHistoryBloc>(() => SpeakingHistoryBloc(sl()));
 
   //api
   sl.registerLazySingleton<AuthApi>(() => AuthApi(sl()));
