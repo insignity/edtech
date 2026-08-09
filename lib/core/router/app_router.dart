@@ -12,7 +12,6 @@ import '../../features/courses/ui/pages/lesson_page.dart';
 import '../../features/recording/models/retelling_result.dart';
 import '../../features/recording/ui/pages/recording_page.dart';
 import '../../features/recording/ui/pages/results_page.dart';
-import '../../features/my_courses/ui/pages/my_courses_page.dart';
 import '../../features/nav_bar/pages/nav_bar_page.dart';
 import '../../features/profile/ui/pages/profile_page.dart';
 import '../../features/speaking_history/ui/pages/speaking_history_page.dart';
@@ -35,14 +34,13 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: LessonRoute.page, path: '/lessons/:lessonId'),
     AutoRoute(page: RecordingRoute.page, path: '/lessons/:lessonId/recording'),
     AutoRoute(page: ResultsRoute.page, path: '/lessons/:lessonId/results'),
-    AutoRoute(page: SpeakingHistoryRoute.page, path: '/speaking-history'),
     AutoRoute(
       page: NavBarRoute.page,
       path: '/',
       guards: [authGuard],
       children: [
         AutoRoute(page: CoursesRoute.page, path: 'courses'),
-        AutoRoute(page: MyCoursesRoute.page, path: 'my_courses'),
+        AutoRoute(page: SpeakingHistoryRoute.page, path: 'speaking-history'),
         AutoRoute(page: ProfileRoute.page, path: 'profile'),
       ],
     ),

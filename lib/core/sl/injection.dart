@@ -26,7 +26,6 @@ import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/ui/bloc/auth_bloc.dart';
 import '../../features/courses/ui/bloc/courses/courses_bloc.dart';
 import '../../features/courses/ui/bloc/lesson/lesson_bloc.dart';
-import '../../features/my_courses/ui/bloc/my_courses_bloc.dart';
 import '../../features/profile/ui/bloc/profile_bloc.dart';
 
 final sl = GetIt.instance;
@@ -81,7 +80,6 @@ void injectServiceLocator(CrashReporter crashReporter) {
   sl.registerFactory<ProfileBloc>(() => ProfileBloc(sl()));
   sl.registerFactory<CoursesBloc>(() => CoursesBloc(sl()));
   sl.registerFactory<CourseDetailsBloc>(() => CourseDetailsBloc(sl()));
-  sl.registerFactory<MyCoursesBloc>(() => MyCoursesBloc(sl()));
   sl.registerFactory<LessonBloc>(() => LessonBloc(sl()));
   sl.registerFactory<RecordingBloc>(
     () => RecordingBloc(recorder: sl(), player: sl(), repository: sl()),

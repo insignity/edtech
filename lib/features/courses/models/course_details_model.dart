@@ -6,7 +6,6 @@ class CourseDetailsModel {
   final String? description;
   final String? previewUrl;
   final int lessonsCount;
-  final bool isSubscribed;
   final List<LessonModel> lessons;
 
   CourseDetailsModel({
@@ -15,7 +14,6 @@ class CourseDetailsModel {
     required this.description,
     required this.previewUrl,
     required this.lessonsCount,
-    required this.isSubscribed,
     required this.lessons,
   });
 
@@ -30,7 +28,6 @@ class CourseDetailsModel {
       description: json['description'] as String?,
       previewUrl: json['preview_url'] as String?,
       lessonsCount: json['lessons_count'] as int,
-      isSubscribed: json['is_subscribed'] as bool,
       lessons: lessons,
     );
   }
@@ -41,7 +38,6 @@ class CourseDetailsModel {
     String? description,
     String? previewUrl,
     int? lessonsCount,
-    bool? isSubscribed,
     List<LessonModel>? lessons,
   }) {
     return CourseDetailsModel(
@@ -50,7 +46,6 @@ class CourseDetailsModel {
       description: description ?? this.description,
       previewUrl: previewUrl ?? this.previewUrl,
       lessonsCount: lessonsCount ?? this.lessonsCount,
-      isSubscribed: isSubscribed ?? this.isSubscribed,
       lessons: lessons ?? this.lessons,
     );
   }

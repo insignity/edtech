@@ -2,15 +2,12 @@ import 'package:edtech/features/courses/data/services/lessons_store_service.dart
 import 'package:edtech/features/courses/models/courses_model.dart';
 import 'package:edtech/features/courses/models/lesson_model.dart';
 import 'package:edtech/features/courses/models/lesson_navigation.dart';
-import 'package:edtech/features/courses/models/subscribe_model.dart';
 
 import '../models/course_details_model.dart';
 import 'courses_api.dart';
 
 abstract class CoursesRepository {
   Future<CoursesModel> getAllCourses();
-
-  Future<CoursesModel> getMySubscriptions();
 
   Future<CourseDetailsModel> getCourseById(String courseId);
 
@@ -19,10 +16,6 @@ abstract class CoursesRepository {
   Future<void> completeLesson(String lessonId);
 
   LessonNavigation getLessonNavigation(String currentLessonId);
-
-  Future<SubscribeModel> subscribe(String courseId);
-
-  Future<SubscribeModel> unsubscribe(String courseId);
 }
 
 class CoursesRepositoryImpl implements CoursesRepository {
@@ -35,11 +28,6 @@ class CoursesRepositoryImpl implements CoursesRepository {
   Future<CoursesModel> getAllCourses() async {
     final result = await api.getAllCourses();
     return result;
-  }
-
-  @override
-  Future<CoursesModel> getMySubscriptions() async {
-    return await api.getMySubscriptions();
   }
 
   @override
@@ -65,19 +53,4 @@ class CoursesRepositoryImpl implements CoursesRepository {
   LessonNavigation getLessonNavigation(String currentLessonId) {
     return lessonsStore.getLessonNavigation(currentLessonId);
   }
-
-  @override
-  Future<SubscribeModel> subscribe(String courseId) async {
-    final result = await api.subscribe(courseId);
-
-    return result;
-  }
-
-  @override
-  Future<SubscribeModel> unsubscribe(String courseId) async {
-    final result = await api.unsubscribe(courseId);
-
-    return result;
-  }
-
 }

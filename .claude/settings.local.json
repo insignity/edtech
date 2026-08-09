@@ -33,7 +33,10 @@
       "PowerShell(flutter test test/features/speaking_history)",
       "PowerShell(flutter test)",
       "PowerShell(flutter test test/features/speaking_history test/features/recording)",
-      "PowerShell(flutter test 2>&1)"
+      "PowerShell(flutter test 2>&1)",
+      "PowerShell(\"removed\")",
+      "PowerShell(flutter analyze lib/ test/)",
+      "PowerShell(flutter build apk --debug 2>&1)"
     ]
   }
 }

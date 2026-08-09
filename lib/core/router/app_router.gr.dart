@@ -162,22 +162,6 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [MyCoursesPage]
-class MyCoursesRoute extends PageRouteInfo<void> {
-  const MyCoursesRoute({List<PageRouteInfo>? children})
-    : super(MyCoursesRoute.name, initialChildren: children);
-
-  static const String name = 'MyCoursesRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const MyCoursesPage();
-    },
-  );
-}
-
-/// generated route for
 /// [NavBarPage]
 class NavBarRoute extends PageRouteInfo<void> {
   const NavBarRoute({List<PageRouteInfo>? children})

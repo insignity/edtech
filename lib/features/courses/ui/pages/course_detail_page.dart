@@ -108,28 +108,6 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                      // Enrolled badge
-                      if (course.isSubscribed)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.successLight,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.check_circle_rounded, size: 16, color: AppColors.success),
-                              const SizedBox(width: 6),
-                              Text(
-                                'You are enrolled',
-                                style: context.text.labelMedium! + AppColors.success,
-                              ),
-                            ],
-                          ),
-                        ),
-
                       Text(course.name, style: context.text.headlineSmall),
                       const SizedBox(height: 16),
 
@@ -140,25 +118,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                           course.description!,
                           style: context.text.bodyLarge,
                         ),
-                        const SizedBox(height: 24),
                       ],
-
-                      SizedBox(
-                        width: double.infinity,
-                        child: course.isSubscribed
-                            ? OutlinedButton(
-                                onPressed: () => bloc.add(CourseDetailsUnsubscribe()),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.error,
-                                  side: const BorderSide(color: AppColors.error),
-                                ),
-                                child: const Text('Unenroll'),
-                              )
-                            : ElevatedButton(
-                                onPressed: () => bloc.add(CourseDetailsSubscribe()),
-                                child: const Text('Enroll now'),
-                              ),
-                      ),
 
                       // Lessons section
                       if (lessons.isNotEmpty) ...[

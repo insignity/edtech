@@ -12,8 +12,6 @@ class CourseDetailsBloc extends Bloc<CourseDetailsEvent, CourseDetailsState> {
 
   CourseDetailsBloc(this.repository) : super(CourseDetailsInitial()) {
     on<CourseDetailsFetch>(_onFetch);
-    on<CourseDetailsSubscribe>(_onSubscribe);
-    on<CourseDetailsUnsubscribe>(_onUnsubscribe);
   }
 
   Future<void> _onFetch(
@@ -25,42 +23,6 @@ class CourseDetailsBloc extends Bloc<CourseDetailsEvent, CourseDetailsState> {
       final course = await repository.getCourseById(event.courseId);
       final lessons = await repository.getLessons(event.courseId);
       emit(CourseDetailsLoaded(course, lessons: lessons));
-    } catch (e) {
-      emit(CourseDetailsError(e.toString()));
-    }
-  }
-
-  Future<void> _onSubscribe(
-    CourseDetailsSubscribe event,
-    Emitter<CourseDetailsState> emit,
-  ) async {
-    if (state is! CourseDetailsLoaded) return;
-    final oldState = state as CourseDetailsLoaded;
-    emit(CourseDetailsLoading());
-    try {
-      final response = await repository.subscribe(oldState.course.id);
-      emit(CourseDetailsLoaded(
-        oldState.course.copyWith(isSubscribed: response.isSubscribed),
-        lessons: oldState.lessons,
-      ));
-    } catch (e) {
-      emit(CourseDetailsError(e.toString()));
-    }
-  }
-
-  Future<void> _onUnsubscribe(
-    CourseDetailsUnsubscribe event,
-    Emitter<CourseDetailsState> emit,
-  ) async {
-    if (state is! CourseDetailsLoaded) return;
-    final oldState = state as CourseDetailsLoaded;
-    emit(CourseDetailsLoading());
-    try {
-      final response = await repository.unsubscribe(oldState.course.id);
-      emit(CourseDetailsLoaded(
-        oldState.course.copyWith(isSubscribed: response.isSubscribed),
-        lessons: oldState.lessons,
-      ));
     } catch (e) {
       emit(CourseDetailsError(e.toString()));
     }

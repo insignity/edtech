@@ -8,7 +8,7 @@ class NavBarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter(
-      routes: const [CoursesRoute(), MyCoursesRoute(), ProfileRoute()],
+      routes: const [CoursesRoute(), SpeakingHistoryRoute(), ProfileRoute()],
       homeIndex: 0,
       builder: (context, child) {
         final tabsRouter = context.tabsRouter;
@@ -28,9 +28,9 @@ class NavBarPage extends StatelessWidget {
                   activeIcon: Icon(Icons.laptop_chromebook),
                 ),
                 BottomNavigationBarItem(
-                  label: 'My Courses',
-                  icon: Icon(Icons.bookmark_border_rounded),
-                  activeIcon: Icon(Icons.bookmark_rounded),
+                  label: 'History',
+                  icon: Icon(Icons.history_outlined),
+                  activeIcon: Icon(Icons.history_rounded),
                 ),
                 BottomNavigationBarItem(
                   label: 'Profile',

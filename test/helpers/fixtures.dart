@@ -18,17 +18,13 @@ LessonModel makeLesson({
   );
 }
 
-CourseDetailsModel makeCourse({
-  String id = 'course-1',
-  bool isSubscribed = false,
-}) {
+CourseDetailsModel makeCourse({String id = 'course-1'}) {
   return CourseDetailsModel(
     id: id,
     name: 'Course',
     description: 'description',
     previewUrl: null,
     lessonsCount: 0,
-    isSubscribed: isSubscribed,
     lessons: const [],
   );
 }

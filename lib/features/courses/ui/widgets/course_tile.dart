@@ -48,26 +48,6 @@ class CourseTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (course.isSubscribed)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.successLight,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.success),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Enrolled',
-                            style: context.text.labelMedium! + AppColors.success,
-                          ),
-                        ],
-                      ),
-                    ),
                   Text(
                     course.name,
                     style: context.text.titleLarge,

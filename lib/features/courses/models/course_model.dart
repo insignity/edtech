@@ -6,7 +6,6 @@ class CourseModel {
   final String? description;
   final String? previewUrl;
   final int lessonsCount;
-  final bool isSubscribed;
   final List<LessonModel>? lessons;
 
   CourseModel({
@@ -15,7 +14,6 @@ class CourseModel {
     required this.description,
     required this.previewUrl,
     required this.lessonsCount,
-    required this.isSubscribed,
     required this.lessons,
   });
 
@@ -32,20 +30,7 @@ class CourseModel {
       description: json['description'] as String?,
       previewUrl: json['preview_url'] as String?,
       lessonsCount: json['lessons_count'] as int,
-      isSubscribed: json['is_subscribed'] as bool,
       lessons: lessons,
     );
   }
-
-  //   @override
-  //   String toString() {
-  //     return '''
-  //     id: $id
-  // name: $name
-  // description: $description
-  // preview_url: ${previewUrl}
-  // lessons_count: ${lessonsCount}
-  // is_subscribed: ${isSubscribed}
-  //     ''';
-  //   }
 }

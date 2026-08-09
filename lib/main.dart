@@ -15,7 +15,6 @@ import 'features/auth/ui/bloc/auth_bloc.dart';
 import 'features/courses/ui/bloc/course_details/course_details_bloc.dart';
 import 'features/courses/ui/bloc/courses/courses_bloc.dart';
 import 'features/courses/ui/bloc/lesson/lesson_bloc.dart';
-import 'features/my_courses/ui/bloc/my_courses_bloc.dart';
 import 'features/profile/ui/bloc/profile_bloc.dart';
 
 Future<void> main() async {
@@ -41,7 +40,6 @@ Future<void> main() async {
         BlocProvider(create: (_) => sl<ProfileBloc>()),
         BlocProvider(create: (_) => sl<CoursesBloc>()),
         BlocProvider(create: (_) => sl<CourseDetailsBloc>()),
-        BlocProvider(create: (_) => sl<MyCoursesBloc>()),
         BlocProvider(create: (_) => sl<LessonBloc>()),
       ],
       child: const MyApp(),

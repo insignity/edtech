@@ -8,11 +8,3 @@ class CourseDetailsFetch extends CourseDetailsEvent {
 
   CourseDetailsFetch(this.courseId);
 }
-
-class CourseDetailsSubscribe extends CourseDetailsEvent {
-  CourseDetailsSubscribe();
-}
-
-class CourseDetailsUnsubscribe extends CourseDetailsEvent {
-  CourseDetailsUnsubscribe();
-}

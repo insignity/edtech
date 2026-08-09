@@ -97,13 +97,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         label: 'City',
                         value: user.city ?? 'Not provided',
                       ),
-                      const SizedBox(height: 12),
-                      _NavTile(
-                        icon: Icons.history_rounded,
-                        label: 'Speaking History',
-                        onTap: () =>
-                            context.router.push(const SpeakingHistoryRoute()),
-                      ),
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
@@ -197,50 +190,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-/// An `_infoTile` that leads somewhere.
-class _NavTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _NavTile({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.grey),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _DeleteAccountDialog extends StatefulWidget {
   final VoidCallback onConfirm;
 
@@ -286,7 +235,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'This will permanently delete your account, subscriptions, '
+            'This will permanently delete your account, recordings, '
             'and learning progress. This action cannot be undone.',
           ),
           const SizedBox(height: 16),
