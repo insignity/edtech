@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:edtech/core/api/rate_limit.dart';
 import 'package:edtech/features/recording/data/services/audio_uploader.dart';
 import 'package:edtech/features/recording/data/speaking_api.dart';
 import 'package:edtech/features/recording/models/analysis_step.dart';
@@ -100,6 +101,11 @@ class RecordingRepositoryImpl implements RecordingRepository {
       try {
         attempt = await api.getAttempt(created.id);
         failures = 0;
+      } on RateLimitException catch (e) {
+        // Polling too eagerly is our fault, not a broken attempt — wait it out
+        // rather than spending the failure budget.
+        await Future<void>.delayed(e.retryAfter);
+        continue;
       } catch (_) {
         if (++failures >= _pollFailureBudget) {
           throw const AnalysisException(
@@ -140,7 +146,15 @@ class RecordingRepositoryImpl implements RecordingRepository {
     required String filePath,
   }) async {
     for (var tries = 1; ; tries++) {
-      final attempt = await api.createAttempt(lessonId);
+      final SpeakingAttempt attempt;
+      try {
+        attempt = await api.createAttempt(lessonId);
+      } on RateLimitException catch (e) {
+        // The learner has run into the per-minute or per-day cap; say so
+        // instead of pretending the server broke.
+        throw AnalysisException(e.message);
+      }
+
       final upload = attempt.upload;
       if (upload == null) {
         throw const AnalysisException(
@@ -168,6 +182,8 @@ class RecordingRepositoryImpl implements RecordingRepository {
   Future<SpeakingAttempt> _completeUpload(String attemptId) async {
     try {
       return await api.completeUpload(attemptId);
+    } on RateLimitException catch (e) {
+      throw AnalysisException(e.message);
     } catch (_) {
       throw const AnalysisException(
         'The server could not confirm your upload. Please try again.',

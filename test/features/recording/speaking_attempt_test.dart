@@ -140,16 +140,45 @@ void main() {
         'attempt_number': 1,
         'status': 'created',
         'upload': {
-          'url': 'https://bucket.s3.amazonaws.com/key?signature',
-          'method': 'PUT',
-          'headers': {'Content-Type': 'audio/mp4'},
+          'url': 'https://bucket.s3.amazonaws.com/',
+          'method': 'POST',
+          'fields': {
+            'key': 'speaking/attempt-1.m4a',
+            'Content-Type': 'audio/mp4',
+            'policy': 'base64policy',
+            'x-amz-signature': 'deadbeef',
+          },
+          'file_field': 'file',
+          'max_size_bytes': 20971520,
           'expires_in': 900,
         },
       });
 
-      expect(attempt.upload!.method, 'PUT');
-      expect(attempt.upload!.headers['Content-Type'], 'audio/mp4');
-      expect(attempt.upload!.expiresIn, 900);
+      final upload = attempt.upload!;
+      expect(upload.method, 'POST');
+      expect(upload.fields['key'], 'speaking/attempt-1.m4a');
+      // Content-Type rides along as a policy field, never as a request header.
+      expect(upload.fields['Content-Type'], 'audio/mp4');
+      expect(upload.fileField, 'file');
+      expect(upload.maxSizeBytes, 20971520);
+      expect(upload.expiresIn, 900);
+    });
+
+    test('falls back to the documented multipart defaults', () {
+      final attempt = SpeakingAttempt.fromJson({
+        'id': 'attempt-1',
+        'lesson_id': 'lesson-1',
+        'attempt_number': 1,
+        'status': 'created',
+        'upload': {'url': 'https://bucket.s3.amazonaws.com/'},
+      });
+
+      final upload = attempt.upload!;
+      expect(upload.method, 'POST');
+      expect(upload.fields, isEmpty);
+      expect(upload.fileField, 'file');
+      expect(upload.maxSizeBytes, AttemptUpload.defaultMaxSizeBytes);
+      expect(AttemptUpload.defaultMaxSizeBytes, 20 * 1024 * 1024);
     });
   });
 

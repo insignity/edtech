@@ -42,7 +42,9 @@
       "PowerShell(& \"A:\\\\Programs\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\" -printcert -jarfile \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\build\\\\app\\\\outputs\\\\bundle\\\\release\\\\app-release.aab\" 2>$null | Select-String -Pattern \"Owner|Valid from\" | Select-Object -First 2; \"--- largest assets ---\"; Get-ChildItem \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\assets\" -Recurse -File | Sort-Object Length -Descending | Select-Object Name,@{n='MB';e={[math]::Round\\($_.Length/1MB,1\\)}} -First 5)",
       "PowerShell($candidates = @\\(\"$env:USERPROFILE\\\\upload-keystore.jks\",\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\android\\\\upload-keystore.jks\",\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\upload-keystore.jks\"\\); foreach \\($c in $candidates\\) { if \\(Test-Path $c\\) { $i = Get-Item $c; \"EXISTS: $\\($i.FullName\\)  $\\($i.Length\\) bytes  created $\\($i.CreationTime\\)\" } }; \"--- key.properties ---\"; if \\(Test-Path \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\android\\\\key.properties\"\\) { \"key.properties EXISTS\" } else { \"key.properties not created yet\" })",
       "PowerShell(\"--- tags ---\")",
-      "PowerShell(\"--- uncommitted ---\")"
+      "PowerShell(\"--- uncommitted ---\")",
+      "Bash(python3 -)",
+      "Bash(grep -vE \"^\\\\s*$\")"
     ]
   }
 }

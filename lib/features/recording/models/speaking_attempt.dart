@@ -27,27 +27,49 @@ enum SpeakingAttemptStatus {
 /// The temporary S3 target handed back when an attempt is created.
 ///
 /// Short-lived and sensitive: never log or persist [url].
+/// Where the recording goes and what S3 demands alongside it.
+///
+/// The bucket takes a browser-style multipart POST: every entry of [fields] is
+/// part of the signed policy and must be sent back verbatim, ahead of the file
+/// itself. Content-Type lives in [fields] too — it is a form field here, not a
+/// request header.
 class AttemptUpload {
   final String url;
   final String method;
-  final Map<String, String> headers;
+
+  /// Signed policy fields, sent unchanged and before the binary.
+  final Map<String, String> fields;
+
+  /// Form field the audio is attached under.
+  final String fileField;
+
+  /// Ceiling the policy enforces; exceeding it earns a 400 from S3, so the
+  /// upload is stopped before it starts.
+  final int maxSizeBytes;
+
   final int expiresIn;
 
   const AttemptUpload({
     required this.url,
     required this.method,
-    required this.headers,
+    required this.fields,
+    required this.fileField,
+    required this.maxSizeBytes,
     required this.expiresIn,
   });
 
+  static const int defaultMaxSizeBytes = 20 * 1024 * 1024;
+
   factory AttemptUpload.fromJson(Json json) => AttemptUpload(
     url: json['url'] as String,
-    method: json['method'] as String? ?? 'PUT',
-    headers:
-        (json['headers'] as Map?)?.map(
+    method: json['method'] as String? ?? 'POST',
+    fields:
+        (json['fields'] as Map?)?.map(
           (key, value) => MapEntry(key.toString(), value.toString()),
         ) ??
         const {},
+    fileField: json['file_field'] as String? ?? 'file',
+    maxSizeBytes: json['max_size_bytes'] as int? ?? defaultMaxSizeBytes,
     expiresIn: json['expires_in'] as int? ?? 900,
   );
 }

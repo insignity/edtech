@@ -1,3 +1,4 @@
+import 'package:edtech/core/api/rate_limit.dart';
 import 'package:edtech/features/recording/data/recording_repository.dart';
 import 'package:edtech/features/recording/data/services/audio_uploader.dart';
 import 'package:edtech/features/recording/data/speaking_api.dart';
@@ -21,9 +22,11 @@ SpeakingAttempt _created(String id) => SpeakingAttempt.fromJson({
   'attempt_number': 2,
   'status': 'created',
   'upload': {
-    'url': 'https://bucket.s3.amazonaws.com/$id?signature',
-    'method': 'PUT',
-    'headers': {'Content-Type': 'audio/mp4'},
+    'url': 'https://bucket.s3.amazonaws.com/',
+    'method': 'POST',
+    'fields': {'key': 'speaking/$id.m4a', 'Content-Type': 'audio/mp4'},
+    'file_field': 'file',
+    'max_size_bytes': 20971520,
     'expires_in': 900,
   },
 });
@@ -98,8 +101,10 @@ void main() {
     () => registerFallbackValue(
       const AttemptUpload(
         url: 'https://example.com',
-        method: 'PUT',
-        headers: {},
+        method: 'POST',
+        fields: {},
+        fileField: 'file',
+        maxSizeBytes: AttemptUpload.defaultMaxSizeBytes,
         expiresIn: 900,
       ),
     ),
@@ -286,5 +291,56 @@ void main() {
       (run.error as AnalysisException).message,
       contains('Lost connection'),
     );
+  });
+
+  group('rate limits', () {
+    // The cap is the learner's to see: "3 per minute", "20 per day". Replacing
+    // it with a generic failure would send them straight back to Retry.
+    test('shows the wait when creating an attempt is capped', () {
+      when(
+        () => api.createAttempt(any()),
+      ).thenThrow(const RateLimitException(Duration(seconds: 45)));
+
+      final run = drive(repository);
+
+      expect(
+        (run.error as AnalysisException).message,
+        contains('45 seconds'),
+      );
+      verifyNever(
+        () => uploader.upload(
+          target: any(named: 'target'),
+          filePath: any(named: 'filePath'),
+        ),
+      );
+    });
+
+    test('shows the wait when confirming the upload is capped', () {
+      when(
+        () => api.completeUpload(any()),
+      ).thenThrow(const RateLimitException(Duration(minutes: 1)));
+
+      final run = drive(repository);
+
+      expect((run.error as AnalysisException).message, contains('1 minute'));
+    });
+
+    // Polling too fast is our doing, so it must not burn the failure budget
+    // that guards against a genuinely dead connection.
+    test('waits out a capped status check and carries on', () {
+      var polls = 0;
+      when(() => api.getAttempt(any())).thenAnswer((_) async {
+        polls++;
+        if (polls <= 3) {
+          throw const RateLimitException(Duration(seconds: 5));
+        }
+        return _completed;
+      });
+
+      final run = drive(repository);
+
+      expect(run.error, isNull);
+      expect(run.updates.last, isA<AnalysisResultReady>());
+    });
   });
 }
