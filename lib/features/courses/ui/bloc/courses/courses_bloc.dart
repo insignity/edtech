@@ -20,13 +20,12 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
     Emitter<CoursesState> emit,
   ) async {
     emit(CoursesLoading());
-    logger.i("CoursesFetchAll started");
 
     try {
       final result = await repository.getAllCourses();
-
       emit(CoursesLoaded(result));
     } catch (e, st) {
+      logger.e('CoursesFetchAll failed', error: e, stackTrace: st);
       emit(CoursesError(e.toString()));
     }
   }

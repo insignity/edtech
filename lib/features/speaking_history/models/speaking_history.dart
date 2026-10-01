@@ -31,6 +31,10 @@ class SpeakingHistoryLesson {
         .toList(),
   );
 
+  @override
+  String toString() =>
+      'SpeakingHistoryLesson(id: $id, title: $title, attempts: ${attempts.length})';
+
   /// The best score across graded attempts, or null while none has finished.
   int? get bestScore {
     int? best;
@@ -85,4 +89,7 @@ class SpeakingHistoryModel {
   );
 
   bool get hasMore => next != null;
+
+  @override
+  String toString() => 'SpeakingHistoryModel(count: $count, fetched: ${lessons.length})';
 }

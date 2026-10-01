@@ -21,6 +21,7 @@ class LessonsStoreService {
           course: lesson.course,
           owner: lesson.owner,
           isCompleted: true,
+          videoSource: lesson.videoSource,
         );
       }
       return lesson;

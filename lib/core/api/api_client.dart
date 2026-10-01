@@ -6,7 +6,7 @@ import 'package:edtech/core/services/session/session_events.dart';
 import 'package:edtech/core/services/token/token_service.dart';
 
 import '../utils/types.dart';
-import 'interceptors/curl_interceptor.dart';
+import 'interceptors/http_log_interceptor.dart';
 
 class ApiClient {
   final Dio _dio;
@@ -39,7 +39,7 @@ class ApiClient {
         baseUrl: baseUrl,
         sessionEvents: _sessionEvents,
       ),
-      CurlInterceptor(),
+      HttpLogInterceptor(),
     ]);
   }
 

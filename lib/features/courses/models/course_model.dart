@@ -33,4 +33,7 @@ class CourseModel {
       lessons: lessons,
     );
   }
+
+  @override
+  String toString() => 'CourseModel(id: $id, name: $name, lessons: $lessonsCount)';
 }

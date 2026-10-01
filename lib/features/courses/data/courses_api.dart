@@ -6,6 +6,7 @@ import '../../../core/utils/error_handler.dart';
 import '../../../core/utils/my_logger.dart';
 import '../models/course_details_model.dart';
 import '../models/courses_model.dart';
+import '../models/lesson_playback_model.dart';
 
 class CoursesApi {
   final ApiClient api;
@@ -13,20 +14,10 @@ class CoursesApi {
   CoursesApi(this.api);
 
   Future<CoursesModel> getAllCourses() async {
-    logger.i("API getAllCourses started");
-
     return guard<CoursesModel>(() async {
-      logger.i("Before GET /courses/");
-
       final response = await api.get('/courses/');
-
-      logger.i("After GET /courses/: ${response.statusCode}");
-      logger.i("Response data: ${response.data}");
-
       final result = CoursesModel.fromJson(response.data as Json);
-
-      logger.i("Parsed courses");
-
+      logger.i('-> $result');
       return result;
     });
   }
@@ -34,9 +25,19 @@ class CoursesApi {
   Future<CourseDetailsModel> getCourseById(String courseId) async {
     return guard<CourseDetailsModel>(() async {
       final response = await api.get('/courses/$courseId');
-
       final result = CourseDetailsModel.fromJson(response.data as Json);
+      logger.i('-> $result');
+      return result;
+    });
+  }
 
+  /// Must be called fresh every time a lesson's video is opened — the signed
+  /// URL it returns expires (900s by default) and is never cached or reused.
+  Future<LessonPlaybackModel> getPlayback(String lessonId) async {
+    return guard<LessonPlaybackModel>(() async {
+      final response = await api.get('/lessons/$lessonId/playback/');
+      final result = LessonPlaybackModel.fromJson(response.data as Json);
+      logger.i('-> $result');
       return result;
     });
   }
@@ -52,7 +53,11 @@ class CoursesApi {
       final response = await api.get('/lessons/', params: {'course': courseId});
       final data = response.data as Map<String, dynamic>;
       final results = data['results'] as List<dynamic>;
-      return results.map((e) => LessonModel.fromJson(e as Map<String, dynamic>)).toList();
+      final result = results
+          .map((e) => LessonModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      logger.i('-> ${result.length} lessons');
+      return result;
     });
   }
 }

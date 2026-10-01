@@ -27,7 +27,5 @@ class CoursesModel {
   }
 
   @override
-  String toString() {
-    return "Courses([${courses}])";
-  }
+  String toString() => 'CoursesModel(count: $count, fetched: ${courses.length})';
 }

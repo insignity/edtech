@@ -15,4 +15,8 @@ class PasswordResetModel {
         uid: json['uid'] as String,
         token: json['token'] as String,
       );
+
+  // token is a one-time reset credential — never print it.
+  @override
+  String toString() => 'PasswordResetModel(uid: $uid, token: ***)';
 }

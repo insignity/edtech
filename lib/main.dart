@@ -10,7 +10,6 @@ import 'core/services/crash/crash_reporting.dart';
 import 'core/services/session/session_events.dart';
 import 'core/sl/injection.dart';
 import 'core/utils/app_bloc_observer.dart';
-import 'core/utils/my_logger.dart';
 import 'features/auth/ui/bloc/auth_bloc.dart';
 import 'features/courses/ui/bloc/course_details/course_details_bloc.dart';
 import 'features/courses/ui/bloc/courses/courses_bloc.dart';
@@ -26,13 +25,6 @@ Future<void> main() async {
 
   Bloc.observer = AppBlocObserver(crashReporter);
   injectServiceLocator(crashReporter);
-
-  logger.i("data");
-  logger.d("data");
-  logger.f("data");
-  logger.t("data");
-  logger.e("data");
-  logger.w("data");
 
   runApp(
     MultiBlocProvider(

@@ -4,6 +4,7 @@ import 'package:edtech/features/courses/models/lesson_model.dart';
 import 'package:edtech/features/courses/models/lesson_navigation.dart';
 
 import '../models/course_details_model.dart';
+import '../models/lesson_playback_model.dart';
 import 'courses_api.dart';
 
 abstract class CoursesRepository {
@@ -16,6 +17,10 @@ abstract class CoursesRepository {
   Future<void> completeLesson(String lessonId);
 
   LessonNavigation getLessonNavigation(String currentLessonId);
+
+  /// Always hits the network — the URL it returns is short-lived and must
+  /// never be reused from a previous call.
+  Future<LessonPlaybackModel> getPlayback(String lessonId);
 }
 
 class CoursesRepositoryImpl implements CoursesRepository {
@@ -52,5 +57,10 @@ class CoursesRepositoryImpl implements CoursesRepository {
   @override
   LessonNavigation getLessonNavigation(String currentLessonId) {
     return lessonsStore.getLessonNavigation(currentLessonId);
+  }
+
+  @override
+  Future<LessonPlaybackModel> getPlayback(String lessonId) {
+    return api.getPlayback(lessonId);
   }
 }

@@ -17,25 +17,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<UserModel> fetchProfile() {
-    logger.i("$this.fetchProfile() started");
-
     return guard<UserModel>(() async {
-      final response = await api.fetchProfile();
-
-      logger.i("$this.fetchProfile() ended");
-
-      return response;
+      final result = await api.fetchProfile();
+      logger.i('-> $result');
+      return result;
     });
   }
 
   @override
   Future<void> deleteAccount() {
-    logger.i("$this.deleteAccount() started");
-
     return guard<void>(() async {
       await api.deleteAccount();
-
-      logger.i("$this.deleteAccount() ended");
     });
   }
 }

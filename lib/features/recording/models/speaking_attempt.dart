@@ -72,6 +72,10 @@ class AttemptUpload {
     maxSizeBytes: json['max_size_bytes'] as int? ?? defaultMaxSizeBytes,
     expiresIn: json['expires_in'] as int? ?? 900,
   );
+
+  // url is a short-lived signed S3 target — never print it.
+  @override
+  String toString() => 'AttemptUpload(url: ***, method: $method)';
 }
 
 class AttemptMetrics {
@@ -243,6 +247,9 @@ class SpeakingAttempt {
     error: _parse(json['error'], AttemptError.fromJson),
     upload: _parse(json['upload'], AttemptUpload.fromJson),
   );
+
+  @override
+  String toString() => 'SpeakingAttempt(id: $id, status: ${status.name})';
 }
 
 /// One row of the attempt history. Everything but the identity is null while an
@@ -281,6 +288,9 @@ class SpeakingAttemptSummary {
     createdAt: DateTime.tryParse(json['created_at'] as String? ?? ''),
     completedAt: DateTime.tryParse(json['completed_at'] as String? ?? ''),
   );
+
+  @override
+  String toString() => 'SpeakingAttemptSummary(id: $id, status: ${status.name})';
 }
 
 /// Swagger types the nested result objects as plain strings, while the written

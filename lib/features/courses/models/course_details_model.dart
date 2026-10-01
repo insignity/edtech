@@ -49,4 +49,8 @@ class CourseDetailsModel {
       lessons: lessons ?? this.lessons,
     );
   }
+
+  @override
+  String toString() =>
+      'CourseDetailsModel(id: $id, name: $name, lessons: ${lessons.length})';
 }

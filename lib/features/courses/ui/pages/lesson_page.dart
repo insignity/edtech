@@ -1,13 +1,15 @@
-import 'dart:async';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:edtech/core/router/app_router.dart';
 import 'package:edtech/core/theme/app_themes.dart';
+import 'package:edtech/features/courses/models/lesson_model.dart';
 import 'package:edtech/features/courses/ui/bloc/lesson/lesson_bloc.dart';
 import 'package:edtech/shared/extensions/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
+
+enum _PlayerStatus { loading, ready, youtube, missing, error }
 
 @RoutePage()
 class LessonPage extends StatefulWidget {
@@ -21,8 +23,9 @@ class LessonPage extends StatefulWidget {
 
 class _LessonPageState extends State<LessonPage> {
   late final LessonBloc _bloc;
-  YoutubePlayerController? _ytController;
-  StreamSubscription<YoutubeVideoState>? _videoStateSub;
+  VideoPlayerController? _videoController;
+  _PlayerStatus _status = _PlayerStatus.loading;
+  String? _youtubeUrl;
   bool _autoCompleted = false;
   String? _currentLessonId;
 
@@ -33,56 +36,139 @@ class _LessonPageState extends State<LessonPage> {
     _bloc.add(LessonLoad(widget.lessonId));
   }
 
-  void _initPlayer(String videoUrl, {required bool alreadyCompleted}) {
-    final videoId = YoutubePlayerController.convertUrlToId(videoUrl);
-    if (videoId == null) return;
-
-    _videoStateSub?.cancel();
-    _ytController?.close();
+  Future<void> _initPlayer(
+    LessonModel lesson, {
+    required bool alreadyCompleted,
+  }) async {
+    await _disposeVideo();
     _autoCompleted = alreadyCompleted;
+    _youtubeUrl = null;
+    final lessonId = lesson.id;
 
-    _ytController = YoutubePlayerController.fromVideoId(
-      videoId: videoId,
-      autoPlay: false,
-      params: const YoutubePlayerParams(
-        showControls: false,
-        showFullscreenButton: false,
-        enableCaption: false,
-        showVideoAnnotations: false,
-        mute: false,
-      ),
-    );
+    if (mounted) setState(() => _status = _PlayerStatus.loading);
 
-    // Listen to position — auto-complete when 10s left
-    _videoStateSub = _ytController!.videoStateStream.listen((videoState) {
-      if (_autoCompleted) return;
-
-      final duration = _ytController!.metadata.duration;
-      final position = videoState.position;
-
-      // Guard: video must have actually started playing
-      if (duration == Duration.zero) return;
-      if (position == Duration.zero) return;
-      if (duration.inSeconds < 15) return; // ignore very short/broken durations
-
-      final remaining = duration - position;
-      if (remaining.inSeconds <= 10) {
-        _autoCompleted = true;
-        final blocState = _bloc.state;
-        if (blocState is LessonLoaded &&
-            !blocState.navigation.current.isCompleted) {
-          _bloc.add(LessonComplete(blocState.navigation.current.id));
+    // Null video_source means the backend predates the playback API — the
+    // legacy lesson.video URL is already the final, playable one.
+    if (lesson.videoSource == null) {
+      if (lesson.video.isEmpty) {
+        if (mounted && _currentLessonId == lessonId) {
+          setState(() => _status = _PlayerStatus.missing);
         }
+        return;
       }
-    });
+      final ok = await _tryPlayVideo(lessonId, lesson.video);
+      if (!ok && mounted && _currentLessonId == lessonId) {
+        setState(() => _status = _PlayerStatus.error);
+      }
+      return;
+    }
 
-    if (mounted) setState(() {});
+    await _loadPlayback(lessonId, retrying: false);
+  }
+
+  // The signed S3 URL expires, so it is always fetched fresh right before
+  // playing — never cached across lesson visits. One retry covers a URL that
+  // went stale between the fetch and the player actually opening it.
+  Future<void> _loadPlayback(String lessonId, {required bool retrying}) async {
+    try {
+      final playback = await _bloc.repository.getPlayback(lessonId);
+      if (!mounted || _currentLessonId != lessonId) return;
+
+      switch (playback.source) {
+        case VideoSource.s3:
+          final url = playback.url;
+          final ok = url != null && await _tryPlayVideo(lessonId, url);
+          if (!ok && mounted && _currentLessonId == lessonId) {
+            if (!retrying) {
+              await _loadPlayback(lessonId, retrying: true);
+            } else {
+              setState(() => _status = _PlayerStatus.error);
+            }
+          }
+        case VideoSource.youtube:
+          setState(() {
+            _youtubeUrl = playback.url;
+            _status = _PlayerStatus.youtube;
+          });
+        case VideoSource.none:
+          setState(() => _status = _PlayerStatus.missing);
+      }
+    } catch (_) {
+      if (!mounted || _currentLessonId != lessonId) return;
+      if (!retrying) {
+        await _loadPlayback(lessonId, retrying: true);
+      } else {
+        setState(() => _status = _PlayerStatus.error);
+      }
+    }
+  }
+
+  /// Returns whether playback actually started. Never throws.
+  Future<bool> _tryPlayVideo(String lessonId, String url) async {
+    final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+    controller.addListener(_videoListener);
+    try {
+      await controller.initialize();
+    } catch (_) {
+      controller.removeListener(_videoListener);
+      await controller.dispose();
+      return false;
+    }
+
+    if (!mounted || _currentLessonId != lessonId) {
+      controller.removeListener(_videoListener);
+      await controller.dispose();
+      return false;
+    }
+
+    _videoController = controller;
+    setState(() => _status = _PlayerStatus.ready);
+    return true;
+  }
+
+  Future<void> _disposeVideo() async {
+    final controller = _videoController;
+    _videoController = null;
+    if (controller != null) {
+      controller.removeListener(_videoListener);
+      await controller.dispose();
+    }
+  }
+
+  Future<void> _openYoutube() async {
+    final url = _youtubeUrl;
+    if (url == null) return;
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
+  // Auto-complete when 10s left
+  void _videoListener() {
+    final controller = _videoController;
+    if (controller == null || _autoCompleted) return;
+    if (!controller.value.isInitialized) return;
+
+    final duration = controller.value.duration;
+    final position = controller.value.position;
+
+    if (duration == Duration.zero) return;
+    if (position == Duration.zero) return;
+    if (duration.inSeconds < 15) return; // ignore very short/broken durations
+
+    final remaining = duration - position;
+    if (remaining.inSeconds <= 10) {
+      _autoCompleted = true;
+      final blocState = _bloc.state;
+      if (blocState is LessonLoaded &&
+          !blocState.navigation.current.isCompleted) {
+        _bloc.add(LessonComplete(blocState.navigation.current.id));
+      }
+    }
   }
 
   @override
   void dispose() {
-    _videoStateSub?.cancel();
-    _ytController?.close();
+    _videoController?.removeListener(_videoListener);
+    _videoController?.dispose();
     super.dispose();
   }
 
@@ -96,7 +182,7 @@ class _LessonPageState extends State<LessonPage> {
           if (_currentLessonId != lessonId) {
             _currentLessonId = lessonId;
             _initPlayer(
-              state.navigation.current.video,
+              state.navigation.current,
               alreadyCompleted: state.navigation.current.isCompleted,
             );
           }
@@ -148,17 +234,15 @@ class _LessonPageState extends State<LessonPage> {
             child: Column(
               children: [
                 // Player
-                if (_ytController != null)
-                  _ShortsPlayer(controller: _ytController!)
-                else
-                  Container(
-                    color: Colors.black,
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    ),
+                _LessonVideoArea(
+                  status: _status,
+                  controller: _videoController,
+                  onOpenYoutube: _openYoutube,
+                  onRetry: () => _initPlayer(
+                    lesson,
+                    alreadyCompleted: lesson.isCompleted,
                   ),
+                ),
 
                 // Scrollable content
                 Expanded(
@@ -333,58 +417,126 @@ class _LessonPageState extends State<LessonPage> {
   }
 }
 
-// Lesson videos are 16:9 with a vertical 9:16 clip centered in the frame and
-// filler on the sides, so we render the player at full size and clip away
-// everything but the middle strip.
-class _ShortsPlayer extends StatelessWidget {
-  final YoutubePlayerController controller;
+// Lesson videos are portrait MP4s served from S3 via a short-lived signed
+// URL, so the ready state just renders the player at its native aspect
+// ratio, filling the available width. Every other state is a small message
+// in the same black frame so the layout doesn't jump around while loading.
+class _LessonVideoArea extends StatelessWidget {
+  final _PlayerStatus status;
+  final VideoPlayerController? controller;
+  final VoidCallback onOpenYoutube;
+  final VoidCallback onRetry;
 
-  const _ShortsPlayer({required this.controller});
+  const _LessonVideoArea({
+    required this.status,
+    required this.controller,
+    required this.onOpenYoutube,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height * 0.6;
-    final visibleWidth = height * 9 / 16;
-    final playerWidth = height * 16 / 9;
+    if (status == _PlayerStatus.ready && controller != null) {
+      return _LessonVideoPlayer(controller: controller!);
+    }
+
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.6;
+
+    Widget child;
+    switch (status) {
+      case _PlayerStatus.ready:
+      case _PlayerStatus.loading:
+        child = const CircularProgressIndicator(color: AppColors.primary);
+      case _PlayerStatus.youtube:
+        child = _VideoMessage(
+          icon: Icons.open_in_new_rounded,
+          message: 'Video is available on YouTube',
+          actionLabel: 'Open video',
+          onAction: onOpenYoutube,
+        );
+      case _PlayerStatus.missing:
+        child = const _VideoMessage(
+          icon: Icons.videocam_off_rounded,
+          message: 'No video for this lesson',
+        );
+      case _PlayerStatus.error:
+        child = _VideoMessage(
+          icon: Icons.error_outline_rounded,
+          message: 'Could not load the video',
+          actionLabel: 'Retry',
+          onAction: onRetry,
+        );
+    }
 
     return Container(
       color: Colors.black,
       width: double.infinity,
-      height: height,
+      constraints: BoxConstraints(maxHeight: maxHeight, minHeight: 200),
       alignment: Alignment.center,
-      child: ClipRect(
-        child: SizedBox(
-          width: visibleWidth,
-          height: height,
-          child: OverflowBox(
-            minWidth: playerWidth,
-            maxWidth: playerWidth,
-            minHeight: height,
-            maxHeight: height,
-            child: YoutubePlayer(
-              controller: controller,
-              aspectRatio: 16 / 9,
-              enableFullScreenOnVerticalDrag: false,
-              builder: (context, player, controller) => Stack(
-                fit: StackFit.expand,
-                children: [
-                  player,
-                  // On mobile the WebView lives in an overlay that ClipRect
-                  // can't reach, so mask the filler sides by painting over them.
-                  Row(
-                    children: [
-                      const Expanded(child: ColoredBox(color: Colors.black)),
-                      SizedBox(
-                        width: visibleWidth,
-                        child: _TapToPlay(controller: controller),
-                      ),
-                      const Expanded(child: ColoredBox(color: Colors.black)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+      child: child,
+    );
+  }
+}
+
+class _VideoMessage extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  const _VideoMessage({
+    required this.icon,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white70, size: 40),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white70),
           ),
+          if (actionLabel != null) ...[
+            const SizedBox(height: 16),
+            OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _LessonVideoPlayer extends StatelessWidget {
+  final VideoPlayerController controller;
+
+  const _LessonVideoPlayer({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.6;
+
+    return Container(
+      color: Colors.black,
+      width: double.infinity,
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      alignment: Alignment.center,
+      child: AspectRatio(
+        aspectRatio: controller.value.aspectRatio,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            VideoPlayer(controller),
+            _TapToPlay(controller: controller),
+          ],
         ),
       ),
     );
@@ -392,20 +544,19 @@ class _ShortsPlayer extends StatelessWidget {
 }
 
 class _TapToPlay extends StatelessWidget {
-  final YoutubePlayerController controller;
+  final VideoPlayerController controller;
 
   const _TapToPlay({required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return YoutubeValueBuilder(
-      controller: controller,
-      buildWhen: (o, n) => o.playerState != n.playerState,
-      builder: (context, value) {
-        final isPlaying = value.playerState == PlayerState.playing;
+    return ValueListenableBuilder<VideoPlayerValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final isPlaying = value.isPlaying;
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: isPlaying ? controller.pauseVideo : controller.playVideo,
+          onTap: isPlaying ? controller.pause : controller.play,
           child: Center(
             child: AnimatedOpacity(
               opacity: isPlaying ? 0 : 1,

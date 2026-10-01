@@ -33,4 +33,7 @@ class UserModel {
       avatarUrl: json['avatar_url'] as String?,
     );
   }
+
+  @override
+  String toString() => 'UserModel(id: $id, email: $email)';
 }

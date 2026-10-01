@@ -42,15 +42,11 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    logger.i("$this.login started");
-
     return guard<TokenModel>(() async {
       final token = await api.login(email, password);
       await tokenService.setAccess(token.access);
       await tokenService.setRefresh(token.refresh);
-
-      logger.i("$this.login ended");
-
+      logger.i('-> $token');
       return token;
     });
   }
@@ -63,26 +59,22 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String phone,
   }) async {
-    logger.i("$this.register() started");
-
     return guard<RegisterModel>(() async {
-      final response = await api.register(
+      final result = await api.register(
         email: email,
         firstName: firstName,
         lastName: lastName,
         password: password,
         phone: phone,
       );
-
-      logger.i("$this.register() ended");
-
-      return response;
+      logger.i('-> $result');
+      return result;
     });
   }
 
   @override
   Future<dynamic> logout() async {
-    logger.i("$this .logout() ");
+    logger.i('AuthRepository.logout');
     await tokenService.deleteAll();
     // Cached attempts carry the previous learner's transcripts.
     attemptStore.clear();
@@ -90,10 +82,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<PasswordResetModel> forgotPassword(String email) async {
-    logger.i("$this.forgotPassword() started");
     return guard<PasswordResetModel>(() async {
       final result = await api.forgotPassword(email);
-      logger.i("$this.forgotPassword() ended");
+      logger.i('-> $result');
       return result;
     });
   }
@@ -104,10 +95,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String token,
     required String newPassword,
   }) async {
-    logger.i("$this.resetPassword() started");
     await guard<void>(() async {
       await api.resetPassword(uid: uid, token: token, newPassword: newPassword);
-      logger.i("$this.resetPassword() ended");
     });
   }
 }

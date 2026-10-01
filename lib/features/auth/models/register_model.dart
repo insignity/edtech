@@ -23,6 +23,9 @@ class RegisterModel  {
       phone: json['phone'] as String,
     );
   }
+
+  @override
+  String toString() => 'RegisterModel(email: $email)';
 }
 
 //{
