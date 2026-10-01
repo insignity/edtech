@@ -42,7 +42,21 @@
       "PowerShell(& \"A:\\\\Programs\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\" -printcert -jarfile \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\build\\\\app\\\\outputs\\\\bundle\\\\release\\\\app-release.aab\" 2>$null | Select-String -Pattern \"Owner|Valid from\" | Select-Object -First 2; \"--- largest assets ---\"; Get-ChildItem \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\assets\" -Recurse -File | Sort-Object Length -Descending | Select-Object Name,@{n='MB';e={[math]::Round\\($_.Length/1MB,1\\)}} -First 5)",
       "PowerShell($candidates = @\\(\"$env:USERPROFILE\\\\upload-keystore.jks\",\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\android\\\\upload-keystore.jks\",\"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\upload-keystore.jks\"\\); foreach \\($c in $candidates\\) { if \\(Test-Path $c\\) { $i = Get-Item $c; \"EXISTS: $\\($i.FullName\\)  $\\($i.Length\\) bytes  created $\\($i.CreationTime\\)\" } }; \"--- key.properties ---\"; if \\(Test-Path \"A:\\\\Development\\\\FlutterProjects\\\\edtech\\\\android\\\\key.properties\"\\) { \"key.properties EXISTS\" } else { \"key.properties not created yet\" })",
       "PowerShell(\"--- tags ---\")",
-      "PowerShell(\"--- uncommitted ---\")"
+      "PowerShell(\"--- uncommitted ---\")",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)",
+      "Bash(tee /c/Users/aiars/AppData/Local/Temp/claude/flutter_run.log)",
+      "Bash(adb devices *)",
+      "PowerShell($candidates = @\\(\"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\", \"$env:ANDROID_HOME\\\\platform-tools\\\\adb.exe\", \"$env:ANDROID_SDK_ROOT\\\\platform-tools\\\\adb.exe\"\\); foreach \\($c in $candidates\\) { if \\(Test-Path $c\\) { echo \"FOUND: $c\" } })",
+      "Bash(flutter doctor *)",
+      "Bash(\"/a/Programs/AndroidSDK/platform-tools/adb.exe\" devices *)",
+      "Bash(mkdir -p /c/Users/aiars/AppData/Local/Temp/claude/A--Development-FlutterProjects-edtech/107f9c08-2958-46a6-82e1-cba77c0ea0fb/scratchpad)",
+      "Bash(/a/Programs/AndroidSDK/platform-tools/adb.exe exec-out *)",
+      "Read(//c/Users/aiars/AppData/Local/Temp/claude/A--Development-FlutterProjects-edtech/107f9c08-2958-46a6-82e1-cba77c0ea0fb/scratchpad/**)",
+      "Bash(curl -s \"https://www.youtube.com/oembed?url=https://www.youtube.com/shorts/dQw4w9WgXcQ&format=json\")",
+      "Bash(curl -s \"https://www.youtube.com/oembed?url=https://www.youtube.com/shorts/Uu3HOgDT1Q4&format=json\")",
+      "Bash(ADB=\"/a/Programs/AndroidSDK/platform-tools/adb.exe\"; OUT=\"/c/Users/aiars/AppData/Local/Temp/claude/A--Development-FlutterProjects-edtech/107f9c08-2958-46a6-82e1-cba77c0ea0fb/scratchpad\"; \"$ADB\" exec-out screencap -p > \"$OUT/screen2.png\")",
+      "Bash(/a/Programs/AndroidSDK/platform-tools/adb.exe shell *)"
     ]
   }
 }

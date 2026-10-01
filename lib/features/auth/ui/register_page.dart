@@ -30,6 +30,16 @@ class _RegisterPageState extends State<RegisterPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
+          context.router.replaceAll([NavBarRoute()]);
+        } else if (state is AuthRegistered) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Account created successfully. Please sign in.'),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
           context.router.replace(const LoginRoute());
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(

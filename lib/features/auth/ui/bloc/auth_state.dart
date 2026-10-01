@@ -15,6 +15,8 @@ final class AuthError extends AuthState {
 
 final class AuthSuccess extends AuthState {}
 
+final class AuthRegistered extends AuthState {}
+
 final class AuthLoggedOut extends AuthState {}
 
 final class AuthPasswordResetSent extends AuthState {

@@ -45,8 +45,10 @@ class _LessonPageState extends State<LessonPage> {
       videoId: videoId,
       autoPlay: false,
       params: const YoutubePlayerParams(
-        showControls: true,
-        showFullscreenButton: true,
+        showControls: false,
+        showFullscreenButton: false,
+        enableCaption: false,
+        showVideoAnnotations: false,
         mute: false,
       ),
     );
@@ -147,7 +149,7 @@ class _LessonPageState extends State<LessonPage> {
               children: [
                 // Player
                 if (_ytController != null)
-                  YoutubePlayer(controller: _ytController!)
+                  _ShortsPlayer(controller: _ytController!)
                 else
                   Container(
                     color: Colors.black,
@@ -323,6 +325,96 @@ class _LessonPageState extends State<LessonPage> {
                   ),
                 ),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Lesson videos are 16:9 with a vertical 9:16 clip centered in the frame and
+// filler on the sides, so we render the player at full size and clip away
+// everything but the middle strip.
+class _ShortsPlayer extends StatelessWidget {
+  final YoutubePlayerController controller;
+
+  const _ShortsPlayer({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height * 0.6;
+    final visibleWidth = height * 9 / 16;
+    final playerWidth = height * 16 / 9;
+
+    return Container(
+      color: Colors.black,
+      width: double.infinity,
+      height: height,
+      alignment: Alignment.center,
+      child: ClipRect(
+        child: SizedBox(
+          width: visibleWidth,
+          height: height,
+          child: OverflowBox(
+            minWidth: playerWidth,
+            maxWidth: playerWidth,
+            minHeight: height,
+            maxHeight: height,
+            child: YoutubePlayer(
+              controller: controller,
+              aspectRatio: 16 / 9,
+              enableFullScreenOnVerticalDrag: false,
+              builder: (context, player, controller) => Stack(
+                fit: StackFit.expand,
+                children: [
+                  player,
+                  // On mobile the WebView lives in an overlay that ClipRect
+                  // can't reach, so mask the filler sides by painting over them.
+                  Row(
+                    children: [
+                      const Expanded(child: ColoredBox(color: Colors.black)),
+                      SizedBox(
+                        width: visibleWidth,
+                        child: _TapToPlay(controller: controller),
+                      ),
+                      const Expanded(child: ColoredBox(color: Colors.black)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TapToPlay extends StatelessWidget {
+  final YoutubePlayerController controller;
+
+  const _TapToPlay({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return YoutubeValueBuilder(
+      controller: controller,
+      buildWhen: (o, n) => o.playerState != n.playerState,
+      builder: (context, value) {
+        final isPlaying = value.playerState == PlayerState.playing;
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: isPlaying ? controller.pauseVideo : controller.playVideo,
+          child: Center(
+            child: AnimatedOpacity(
+              opacity: isPlaying ? 0 : 1,
+              duration: const Duration(milliseconds: 200),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 72,
+              ),
             ),
           ),
         );
