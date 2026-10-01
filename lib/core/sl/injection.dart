@@ -1,4 +1,5 @@
 import 'package:edtech/core/api/api_client.dart';
+import 'package:edtech/core/api/rate_limit.dart';
 import 'package:edtech/core/constants/constants.dart';
 import 'package:edtech/core/router/guards/auth_guard.dart';
 import 'package:edtech/core/services/crash/crash_reporter.dart';
@@ -60,9 +61,18 @@ void injectServiceLocator(CrashReporter crashReporter) {
   // the JWT and log the presigned URL.
   sl.registerLazySingleton<AudioUploader>(() => AudioUploaderImpl());
 
+  // Shared so a 429 on one screen holds every other caller off the same
+  // endpoint too.
+  sl.registerLazySingleton<RateLimiter>(() => RateLimiter());
+
   //api
   sl.registerLazySingleton<ApiClient>(
-    () => ApiClient(Constants.url, tokenService: sl(), sessionEvents: sl()),
+    () => ApiClient(
+      Constants.url,
+      tokenService: sl(),
+      sessionEvents: sl(),
+      rateLimiter: sl(),
+    ),
   );
 
   //repositories
