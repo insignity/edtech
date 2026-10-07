@@ -5,6 +5,7 @@ import 'package:edtech/features/courses/models/lesson_model.dart';
 import 'package:edtech/features/courses/ui/bloc/lesson/lesson_bloc.dart';
 import 'package:edtech/shared/extensions/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
@@ -534,8 +535,143 @@ class _LessonVideoPlayer extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            VideoPlayer(controller),
+            Hero(
+              tag: _videoHeroTag(controller),
+              child: VideoPlayer(controller),
+            ),
             _TapToPlay(controller: controller),
+            Positioned(
+              right: 4,
+              bottom: 4,
+              child: _FullscreenButton(controller: controller),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Stable per controller instance, which lives across the inline and
+// fullscreen pages for the same lesson — that's what lets the Hero match.
+Object _videoHeroTag(VideoPlayerController controller) =>
+    'lesson-video-${identityHashCode(controller)}';
+
+class _FullscreenButton extends StatelessWidget {
+  final VideoPlayerController controller;
+
+  const _FullscreenButton({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return _RoundIconButton(
+      icon: Icons.fullscreen_rounded,
+      onPressed: () =>
+          Navigator.of(context).push(_fullscreenVideoRoute(controller)),
+    );
+  }
+}
+
+// A plain fade instead of a page transition — the video itself grows into
+// place via the Hero flight above, so it must never slide up like a modal.
+Route<void> _fullscreenVideoRoute(VideoPlayerController controller) {
+  return PageRouteBuilder<void>(
+    opaque: true,
+    barrierColor: Colors.black,
+    transitionDuration: const Duration(milliseconds: 220),
+    reverseTransitionDuration: const Duration(milliseconds: 180),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        _FullscreenVideoPage(controller: controller),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
+}
+
+// A plain Icon/IconButton gets lost over bright video frames, so this gives
+// it a dark backing and a shadow to stay visible against any content.
+class _RoundIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _RoundIconButton({required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black54,
+      shape: const CircleBorder(),
+      elevation: 4,
+      shadowColor: Colors.black,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
+      ),
+    );
+  }
+}
+
+// Reuses the same controller as the inline player, so play position, pause
+// state and the auto-complete listener all carry over without interruption.
+class _FullscreenVideoPage extends StatefulWidget {
+  final VideoPlayerController controller;
+
+  const _FullscreenVideoPage({required this.controller});
+
+  @override
+  State<_FullscreenVideoPage> createState() => _FullscreenVideoPageState();
+}
+
+class _FullscreenVideoPageState extends State<_FullscreenVideoPage> {
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      onPopInvokedWithResult: (_, _) =>
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Center(
+              child: AspectRatio(
+                aspectRatio: widget.controller.value.aspectRatio,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Hero(
+                      tag: _videoHeroTag(widget.controller),
+                      child: VideoPlayer(widget.controller),
+                    ),
+                    _TapToPlay(controller: widget.controller),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              right: 12,
+              bottom: 12,
+              child: SafeArea(
+                child: _RoundIconButton(
+                  icon: Icons.fullscreen_exit_rounded,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ),
           ],
         ),
       ),
