@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:auto_route/auto_route.dart';
 import 'package:edtech/core/router/app_router.dart';
 import 'package:edtech/core/theme/app_themes.dart';
@@ -30,11 +32,49 @@ class _LessonPageState extends State<LessonPage> {
   bool _autoCompleted = false;
   String? _currentLessonId;
 
+  final _scrollController = ScrollController();
+  final _scrollKey = GlobalKey();
+  final _videoKey = GlobalKey();
+  bool _videoInView = false;
+
   @override
   void initState() {
     super.initState();
     _bloc = context.read<LessonBloc>();
     _bloc.add(LessonLoad(widget.lessonId));
+    _scrollController.addListener(_syncPlaybackWithVisibility);
+  }
+
+  bool _isVideoInView() {
+    final video = _videoKey.currentContext?.findRenderObject();
+    final viewport = _scrollKey.currentContext?.findRenderObject();
+    if (video is! RenderBox || viewport is! RenderBox) return false;
+    if (!video.attached || !viewport.attached || video.size.height <= 0) {
+      return false;
+    }
+
+    final videoTop = video.localToGlobal(Offset.zero).dy;
+    final viewTop = viewport.localToGlobal(Offset.zero).dy;
+    final visible =
+        math.min(videoTop + video.size.height, viewTop + viewport.size.height) -
+        math.max(videoTop, viewTop);
+    return visible >= video.size.height * 0.5;
+  }
+
+  // Acts only on the moment the video enters or leaves view, so a manual
+  // pause while it stays on screen is never overridden.
+  void _syncPlaybackWithVisibility() {
+    final controller = _videoController;
+    if (controller == null || !controller.value.isInitialized) return;
+
+    final inView = _isVideoInView();
+    if (inView == _videoInView) return;
+    _videoInView = inView;
+    if (inView) {
+      controller.play();
+    } else {
+      controller.pause();
+    }
   }
 
   Future<void> _initPlayer(
@@ -44,6 +84,7 @@ class _LessonPageState extends State<LessonPage> {
     await _disposeVideo();
     _autoCompleted = alreadyCompleted;
     _youtubeUrl = null;
+    if (_scrollController.hasClients) _scrollController.jumpTo(0);
     final lessonId = lesson.id;
 
     if (mounted) setState(() => _status = _PlayerStatus.loading);
@@ -123,13 +164,19 @@ class _LessonPageState extends State<LessonPage> {
     }
 
     _videoController = controller;
+    _videoInView = false;
     setState(() => _status = _PlayerStatus.ready);
+    // The player only gets its real size after this frame is laid out.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _syncPlaybackWithVisibility(),
+    );
     return true;
   }
 
   Future<void> _disposeVideo() async {
     final controller = _videoController;
     _videoController = null;
+    _videoInView = false;
     if (controller != null) {
       controller.removeListener(_videoListener);
       await controller.dispose();
@@ -168,6 +215,7 @@ class _LessonPageState extends State<LessonPage> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _videoController?.removeListener(_videoListener);
     _videoController?.dispose();
     super.dispose();
@@ -234,129 +282,147 @@ class _LessonPageState extends State<LessonPage> {
           body: SafeArea(
             child: Column(
               children: [
-                // Player
-                _LessonVideoArea(
-                  status: _status,
-                  controller: _videoController,
-                  onOpenYoutube: _openYoutube,
-                  onRetry: () => _initPlayer(
-                    lesson,
-                    alreadyCompleted: lesson.isCompleted,
-                  ),
-                ),
-
-                // Scrollable content
+                // Scrollable content — the player scrolls away with it
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
+                    key: _scrollKey,
+                    controller: _scrollController,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => context.router.pop(),
-                              child: const Icon(
-                                Icons.arrow_back_rounded,
-                                color: AppColors.darkText,
-                              ),
+                        KeyedSubtree(
+                          key: _videoKey,
+                          child: _LessonVideoArea(
+                            status: _status,
+                            controller: _videoController,
+                            onOpenYoutube: _openYoutube,
+                            onRetry: () => _initPlayer(
+                              lesson,
+                              alreadyCompleted: lesson.isCompleted,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                lesson.name,
-                                style: context.text.titleLarge,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        if (lesson.description != null &&
-                            lesson.description!.isNotEmpty) ...[
-                          const SizedBox(height: 20),
-                          Text('Description', style: context.text.titleMedium),
-                          const SizedBox(height: 8),
-                          Text(
-                            lesson.description!,
-                            style: context.text.bodyLarge,
                           ),
-                        ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => context.router.pop(),
+                                    child: const Icon(
+                                      Icons.arrow_back_rounded,
+                                      color: AppColors.darkText,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      lesson.name,
+                                      style: context.text.titleLarge,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-                        const SizedBox(height: 24),
-
-                        // Mark as complete button
-                        SizedBox(
-                          width: double.infinity,
-                          child: lesson.isCompleted
-                              ? Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.successLight,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.check_circle_rounded,
-                                        color: AppColors.success,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'Completed',
-                                        style: context.text.labelLarge!
-                                            .copyWith(color: AppColors.success),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : ElevatedButton.icon(
-                                  onPressed: loaded.isCompleting
-                                      ? null
-                                      : () => _bloc.add(
-                                          LessonComplete(lesson.id),
-                                        ),
-                                  icon: loaded.isCompleting
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : const Icon(Icons.check_rounded),
-                                  label: Text(
-                                    loaded.isCompleting
-                                        ? 'Saving...'
-                                        : 'Mark as Complete',
-                                  ),
+                              if (lesson.description != null &&
+                                  lesson.description!.isNotEmpty) ...[
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Description',
+                                  style: context.text.titleMedium,
                                 ),
-                        ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  lesson.description!,
+                                  style: context.text.bodyLarge,
+                                ),
+                              ],
 
-                        // TODO Uncomment when necessary
-                        const SizedBox(height: 16),
+                              const SizedBox(height: 24),
 
-                        // Record retelling button
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: () => context.router.push(
-                              RecordingRoute(
-                                lessonId: lesson.id,
-                                lessonTitle: lesson.name,
+                              // Mark as complete button
+                              SizedBox(
+                                width: double.infinity,
+                                child: lesson.isCompleted
+                                    ? Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.successLight,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.check_circle_rounded,
+                                              color: AppColors.success,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Completed',
+                                              style: context.text.labelLarge!
+                                                  .copyWith(
+                                                    color: AppColors.success,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : ElevatedButton.icon(
+                                        onPressed: loaded.isCompleting
+                                            ? null
+                                            : () => _bloc.add(
+                                                LessonComplete(lesson.id),
+                                              ),
+                                        icon: loaded.isCompleting
+                                            ? const SizedBox(
+                                                width: 18,
+                                                height: 18,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: Colors.white,
+                                                    ),
+                                              )
+                                            : const Icon(Icons.check_rounded),
+                                        label: Text(
+                                          loaded.isCompleting
+                                              ? 'Saving...'
+                                              : 'Mark as Complete',
+                                        ),
+                                      ),
                               ),
-                            ),
-                            icon: const Icon(Icons.mic_rounded),
-                            label: const Text('Record Retelling'),
+
+                              // TODO Uncomment when necessary
+                              const SizedBox(height: 16),
+
+                              // Record retelling button
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  onPressed: () => context.router.push(
+                                    RecordingRoute(
+                                      lessonId: lesson.id,
+                                      lessonTitle: lesson.name,
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.mic_rounded),
+                                  label: const Text('Record Retelling'),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 32),
                       ],
                     ),
                   ),
